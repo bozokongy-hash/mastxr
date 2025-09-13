@@ -14,7 +14,7 @@ local Window = Fluent:CreateWindow({
     MinimizeKey = Enum.KeyCode.LeftControl
 })
 
--- Tabs (all with working icons)
+-- Tabs
 local Tabs = {
     StealBrainrot = Window:AddTab({ Title = "Steal Brainrot", Icon = "cpu" }),
     Rivals        = Window:AddTab({ Title = "Rivals", Icon = "swords" }),
@@ -66,10 +66,10 @@ Tabs.Rivals:AddButton({
 
 -- ===== Hypershot Tab =====
 Tabs.Hypershot:AddButton({
-    Title = "Script 1",
+    Title = "Zephyr Hypershot Script",
     Description = "Hypershot - Main Script",
     Callback = function()
-        loadstring(game:HttpGet("https://pastebin.com/raw/your_hypershot_script1"))()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/TheRealAvrwm/Zephyr-V2/refs/heads/main/Hypershot.lua", true))()
         Window:Destroy()
     end
 })
