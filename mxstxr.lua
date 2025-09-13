@@ -14,15 +14,16 @@ local Window = Fluent:CreateWindow({
     MinimizeKey = Enum.KeyCode.LeftControl
 })
 
--- Tabs (all with icons)
+-- Tabs (all with working icons)
 local Tabs = {
-    StealBrainrot = Window:AddTab({ Title = "Steal Brainrot", Icon = "zap" }),     -- ⚡ zap icon
+    StealBrainrot = Window:AddTab({ Title = "Steal Brainrot", Icon = "cpu" }),     -- 🖥️ CPU icon
     Rivals        = Window:AddTab({ Title = "Rivals", Icon = "swords" }),         -- ⚔️ swords
     Hypershot     = Window:AddTab({ Title = "Hypershot", Icon = "crosshair" }),   -- 🎯 crosshair
+    NFLUniverse   = Window:AddTab({ Title = "NFL Universe", Icon = "shield" }),   -- 🛡️ shield icon
     Settings      = Window:AddTab({ Title = "Settings", Icon = "settings" })      -- ⚙️ gear
 }
 
--- Steal Brainrot Tab (2 scripts)
+-- ===== Steal Brainrot Tab (2 scripts) =====
 Tabs.StealBrainrot:AddButton({
     Title = "Script 1",
     Description = "Steal Brainrot - Main Script",
@@ -30,7 +31,6 @@ Tabs.StealBrainrot:AddButton({
         loadstring(game:HttpGet("https://pastebin.com/raw/your_steal_brainrot_script1"))()
     end
 })
-
 Tabs.StealBrainrot:AddButton({
     Title = "Script 2",
     Description = "Steal Brainrot - Extra",
@@ -39,7 +39,7 @@ Tabs.StealBrainrot:AddButton({
     end
 })
 
--- Rivals Tab (2 scripts)
+-- ===== Rivals Tab (2 scripts) =====
 Tabs.Rivals:AddButton({
     Title = "Script 1",
     Description = "Rivals - Main Script",
@@ -47,7 +47,6 @@ Tabs.Rivals:AddButton({
         loadstring(game:HttpGet("https://pastebin.com/raw/your_rivals_script1"))()
     end
 })
-
 Tabs.Rivals:AddButton({
     Title = "Script 2",
     Description = "Rivals - Extra",
@@ -56,7 +55,7 @@ Tabs.Rivals:AddButton({
     end
 })
 
--- Hypershot Tab (2 scripts)
+-- ===== Hypershot Tab (2 scripts) =====
 Tabs.Hypershot:AddButton({
     Title = "Script 1",
     Description = "Hypershot - Main Script",
@@ -64,7 +63,6 @@ Tabs.Hypershot:AddButton({
         loadstring(game:HttpGet("https://pastebin.com/raw/your_hypershot_script1"))()
     end
 })
-
 Tabs.Hypershot:AddButton({
     Title = "Script 2",
     Description = "Hypershot - Extra",
@@ -73,7 +71,23 @@ Tabs.Hypershot:AddButton({
     end
 })
 
--- Settings (Save + Configs)
+-- ===== NFL Universe Tab (2 scripts) =====
+Tabs.NFLUniverse:AddButton({
+    Title = "Script 1",
+    Description = "NFL Universe - Main Script",
+    Callback = function()
+        loadstring(game:HttpGet("https://pastebin.com/raw/your_nfl_script1"))()
+    end
+})
+Tabs.NFLUniverse:AddButton({
+    Title = "Script 2",
+    Description = "NFL Universe - Extra",
+    Callback = function()
+        loadstring(game:HttpGet("https://pastebin.com/raw/your_nfl_script2"))()
+    end
+})
+
+-- ===== Settings Tab (Save + Configs) =====
 SaveManager:SetLibrary(Fluent)
 InterfaceManager:SetLibrary(Fluent)
 SaveManager:IgnoreThemeSettings()
