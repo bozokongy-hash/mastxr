@@ -1,90 +1,152 @@
---[[ WARNING: Heads up! Use at your own risk! ]] 
+--[[ 
+    SCRIPT HUB - Multi-Script Loader with Key System
+    WARNING: Use at your own risk
+--]]
 
+-- =========================
+-- 🔑 Key System
+-- =========================
+local allowedKeys = {"sweb123"} -- add more keys if needed
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local GuiService = game:GetService("StarterGui")
+
+-- Simple GUI input for key (using TextBox)
+local function requestKey()
+    local ScreenGui = Instance.new("ScreenGui")
+    ScreenGui.Name = "KeyPromptGui"
+    ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+
+    local Frame = Instance.new("Frame")
+    Frame.Size = UDim2.new(0, 300, 0, 150)
+    Frame.Position = UDim2.new(0.5, -150, 0.5, -75)
+    Frame.BackgroundColor3 = Color3.fromRGB(25,25,25)
+    Frame.BorderSizePixel = 0
+    Frame.Parent = ScreenGui
+
+    local UICorner = Instance.new("UICorner")
+    UICorner.CornerRadius = UDim.new(0, 10)
+    UICorner.Parent = Frame
+
+    local Title = Instance.new("TextLabel")
+    Title.Text = "Enter Key"
+    Title.Size = UDim2.new(1,0,0,50)
+    Title.BackgroundTransparency = 1
+    Title.TextScaled = true
+    Title.TextColor3 = Color3.fromRGB(255,255,255)
+    Title.Font = Enum.Font.SourceSansBold
+    Title.Parent = Frame
+
+    local TextBox = Instance.new("TextBox")
+    TextBox.PlaceholderText = "Key here..."
+    TextBox.Size = UDim2.new(1, -20, 0, 50)
+    TextBox.Position = UDim2.new(0,10,0,60)
+    TextBox.BackgroundColor3 = Color3.fromRGB(40,40,40)
+    TextBox.TextColor3 = Color3.fromRGB(255,255,255)
+    TextBox.Font = Enum.Font.SourceSans
+    TextBox.TextScaled = true
+    TextBox.Parent = Frame
+
+    local Submit = Instance.new("TextButton")
+    Submit.Text = "Submit"
+    Submit.Size = UDim2.new(0, 100, 0, 30)
+    Submit.Position = UDim2.new(0.5, -50, 1, -40)
+    Submit.BackgroundColor3 = Color3.fromRGB(255,0,0)
+    Submit.TextColor3 = Color3.fromRGB(255,255,255)
+    Submit.Font = Enum.Font.SourceSansBold
+    Submit.TextScaled = true
+    Submit.Parent = Frame
+
+    local keyValid = false
+    local connection
+    connection = Submit.MouseButton1Click:Connect(function()
+        local inputKey = TextBox.Text
+        for _, validKey in pairs(allowedKeys) do
+            if inputKey == validKey then
+                keyValid = true
+                break
+            end
+        end
+        if keyValid then
+            ScreenGui:Destroy()
+        else
+            TextBox.Text = ""
+            TextBox.PlaceholderText = "Invalid Key!"
+        end
+    end)
+
+    repeat wait() until keyValid
+end
+
+requestKey() -- run key system before loading hub
+
+-- =========================
+-- 🔧 Load RedzLib GUI
+-- =========================
 local redzlib = loadstring(game:HttpGet("https://gist.githubusercontent.com/MjContiga1/54c07e52fc2aab8873b68d91a71d11c6/raw/fb4f1d6a7c89465f3b39bc00eeff09af24b88f20/Redz%2520hub.lua"))()
 
--- Create main hub window
-local Window = redzlib:MakeWindow({ 
-    Title = "Sweb Script Hub", 
-    SubTitle = "Multi-Script Hub", 
-    SaveFolder = "SwebScriptHub" 
+-- Create main window
+local Window = redzlib:MakeWindow({
+    Title = "Sweb Hub",
+    SubTitle = "Multi-Script Loader",
+    SaveFolder = "SwebHub"
 })
 
-Window:AddMinimizeButton({ 
-    Button = { Image = "rbxassetid://139438145143663", BackgroundTransparency = 0 }, 
-    Corner = { CornerRadius = UDim.new(35, 1) } 
+Window:AddMinimizeButton({
+    Button = { Image = "rbxassetid://139438145143663", BackgroundTransparency = 0 },
+    Corner = { CornerRadius = UDim.new(35, 1) },
 })
 
--- ===========================
--- EXAMPLE TAB 1
--- ===========================
-local Tab1 = Window:MakeTab({"Scripts 1", "rbxassetid://7733960981"})
-Tab1:AddSection({"Popular Scripts"})
+-- =========================
+-- 🏠 Home Tab
+-- =========================
+local HomeTab = Window:MakeTab({"Home", "rbxassetid://7733960981"})
+Window:SelectTab(HomeTab)
 
-Tab1:AddButton({"Load Script A", function()
-    loadstring(game:HttpGet("YOUR_SCRIPT_A_URL_HERE"))()
+local SectionHome = HomeTab:AddSection({"Credits"})
+HomeTab:AddParagraph({"Sweb Hub", "Created by Top1 Sweb\nDiscord: @4503\nUse at your own risk!"})
+
+-- =========================
+-- 📂 Scripts Tab
+-- =========================
+local ScriptsTab = Window:MakeTab({"Scripts", "rbxassetid://7743875962"})
+Window:SelectTab(ScriptsTab)
+
+local SectionScripts = ScriptsTab:AddSection({"Available Scripts"})
+
+-- Example Script Buttons (replace URLs with your actual scripts)
+ScriptsTab:AddButton({"Script 1", function()
+    loadstring(game:HttpGet("https://pastebin.com/raw/XXXXXX"))()
 end})
 
-Tab1:AddButton({"Load Script B", function()
-    loadstring(game:HttpGet("YOUR_SCRIPT_B_URL_HERE"))()
+ScriptsTab:AddButton({"Script 2", function()
+    loadstring(game:HttpGet("https://pastebin.com/raw/YYYYYY"))()
 end})
 
-Tab1:AddDropdown({
-    Name = "Multi-Script Loader",
-    Options = {"Script X", "Script Y", "Script Z"},
-    Default = "Script X",
-    MultiSelect = true,
-    Callback = function(selected)
-        for _, scriptName in ipairs(selected) do
-            if scriptName == "Script X" then
-                loadstring(game:HttpGet("YOUR_SCRIPT_X_URL"))()
-            elseif scriptName == "Script Y" then
-                loadstring(game:HttpGet("YOUR_SCRIPT_Y_URL"))()
-            elseif scriptName == "Script Z" then
-                loadstring(game:HttpGet("YOUR_SCRIPT_Z_URL"))()
-            end
-        end
-    end
-})
-
--- ===========================
--- EXAMPLE TAB 2
--- ===========================
-local Tab2 = Window:MakeTab({"Scripts 2", "rbxassetid://7743875962"})
-Tab2:AddSection({"Other Scripts"})
-
-Tab2:AddButton({"Load Script C", function()
-    loadstring(game:HttpGet("YOUR_SCRIPT_C_URL_HERE"))()
+ScriptsTab:AddButton({"Script 3", function()
+    loadstring(game:HttpGet("https://pastebin.com/raw/ZZZZZZ"))()
 end})
 
-Tab2:AddButton({"Load Script D", function()
-    loadstring(game:HttpGet("YOUR_SCRIPT_D_URL_HERE"))()
+ScriptsTab:AddButton({"Script 4", function()
+    loadstring(game:HttpGet("https://pastebin.com/raw/AAAAAA"))()
 end})
 
--- ===========================
--- OPTION: Add global multi-select or custom scripts dynamically
--- ===========================
-local allScripts = {
-    ["Script 1"] = "URL_1",
-    ["Script 2"] = "URL_2",
-    ["Script 3"] = "URL_3"
-}
-
-local MultiTab = Window:MakeTab({"Multi Loader", "rbxassetid://7733960981"})
-MultiTab:AddDropdown({
-    Name = "Select Scripts",
-    Options = {"Script 1", "Script 2", "Script 3"},
-    MultiSelect = true,
-    Callback = function(selected)
-        for _, name in ipairs(selected) do
-            if allScripts[name] then
-                loadstring(game:HttpGet(allScripts[name]))()
-            end
-        end
-    end
-})
-
-MultiTab:AddButton({"Load All Scripts", function()
-    for _, url in pairs(allScripts) do
-        loadstring(game:HttpGet(url))()
-    end
+ScriptsTab:AddButton({"Script 5", function()
+    loadstring(game:HttpGet("https://pastebin.com/raw/BBBBBB"))()
 end})
+
+-- =========================
+-- ✅ Optional: Dialog Example
+-- =========================
+ScriptsTab:AddButton({"Test Dialog", function()
+    Window:Dialog({
+        Title = "Test",
+        Text = "This is a test dialog!",
+        Options = {{"OK", function() end}}
+    })
+end})
+
+-- =========================
+-- HUB READY
+-- =========================
+print("Sweb Hub Loaded Successfully!")
