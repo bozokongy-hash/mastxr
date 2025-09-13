@@ -1,92 +1,16 @@
 --[[ 
     FLUENT SCRIPT HUB - Multi-Script Loader with Key System
-    WARNING: Use at your own risk
+    Using Fluent UI for key input
 --]]
 
--- =========================
--- 🔑 Key System
--- =========================
-local allowedKeys = {"sweb123"} -- Add more keys if needed
-local Players = game:GetService("Players")
-local LocalPlayer = Players.LocalPlayer
-local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+local allowedKeys = {"sweb123"} -- Add more keys here
 
--- Simple key prompt using a ScreenGui
-local function requestKey()
-    local ScreenGui = Instance.new("ScreenGui")
-    ScreenGui.Name = "KeyPromptGui"
-    ScreenGui.Parent = PlayerGui
-
-    local Frame = Instance.new("Frame")
-    Frame.Size = UDim2.new(0, 300, 0, 150)
-    Frame.Position = UDim2.new(0.5, -150, 0.5, -75)
-    Frame.BackgroundColor3 = Color3.fromRGB(25,25,25)
-    Frame.BorderSizePixel = 0
-    Frame.Parent = ScreenGui
-
-    local UICorner = Instance.new("UICorner")
-    UICorner.CornerRadius = UDim.new(0, 10)
-    UICorner.Parent = Frame
-
-    local Title = Instance.new("TextLabel")
-    Title.Text = "Enter Key"
-    Title.Size = UDim2.new(1,0,0,50)
-    Title.BackgroundTransparency = 1
-    Title.TextScaled = true
-    Title.TextColor3 = Color3.fromRGB(255,255,255)
-    Title.Font = Enum.Font.SourceSansBold
-    Title.Parent = Frame
-
-    local TextBox = Instance.new("TextBox")
-    TextBox.PlaceholderText = "Key here..."
-    TextBox.Size = UDim2.new(1, -20, 0, 50)
-    TextBox.Position = UDim2.new(0,10,0,60)
-    TextBox.BackgroundColor3 = Color3.fromRGB(40,40,40)
-    TextBox.TextColor3 = Color3.fromRGB(255,255,255)
-    TextBox.Font = Enum.Font.SourceSans
-    TextBox.TextScaled = true
-    TextBox.Parent = Frame
-
-    local Submit = Instance.new("TextButton")
-    Submit.Text = "Submit"
-    Submit.Size = UDim2.new(0, 100, 0, 30)
-    Submit.Position = UDim2.new(0.5, -50, 1, -40)
-    Submit.BackgroundColor3 = Color3.fromRGB(255,0,0)
-    Submit.TextColor3 = Color3.fromRGB(255,255,255)
-    Submit.Font = Enum.Font.SourceSansBold
-    Submit.TextScaled = true
-    Submit.Parent = Frame
-
-    local keyValid = false
-    local connection
-    connection = Submit.MouseButton1Click:Connect(function()
-        local inputKey = TextBox.Text
-        for _, validKey in pairs(allowedKeys) do
-            if inputKey == validKey then
-                keyValid = true
-                break
-            end
-        end
-        if keyValid then
-            ScreenGui:Destroy()
-        else
-            TextBox.Text = ""
-            TextBox.PlaceholderText = "Invalid Key!"
-        end
-    end)
-
-    repeat wait() until keyValid
-end
-
-requestKey() -- run key system before loading hub
-
--- =========================
--- 🔧 Load Fluent GUI
--- =========================
+-- Load Fluent GUI
 local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
 local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua"))()
 local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/InterfaceManager.lua"))()
 
+-- Create the main window
 local Window = Fluent:CreateWindow({
     Title = "Sweb Hub",
     SubTitle = "Multi-Script Loader",
@@ -98,15 +22,48 @@ local Window = Fluent:CreateWindow({
 })
 
 local Tabs = {
-    Home = Window:AddTab({ Title = "Home", Icon = "" }),
-    Scripts = Window:AddTab({ Title = "Scripts", Icon = "" }),
-    Settings = Window:AddTab({ Title = "Settings", Icon = "settings" })
+    Key = Window:AddTab({Title = "Enter Key", Icon = ""}),
+    Home = Window:AddTab({Title = "Home", Icon = ""}),
+    Scripts = Window:AddTab({Title = "Scripts", Icon = ""}),
+    Settings = Window:AddTab({Title = "Settings", Icon = "settings"})
 }
 
-local Options = Fluent.Options
+-- Lock all tabs except Key
+Tabs.Home:SetDisabled(true)
+Tabs.Scripts:SetDisabled(true)
+Tabs.Settings:SetDisabled(true)
+Window:SelectTab(Tabs.Key) -- Force user to enter key first
 
 -- =========================
--- 🏠 Home Tab
+-- Key System using Fluent
+-- =========================
+local KeyInputBox = Tabs.Key:AddInput("HubKey", {
+    Title = "Enter Hub Key",
+    Placeholder = "Type key here...",
+    Finished = true, -- Only calls callback when user presses Enter
+    Callback = function(Value)
+        local success = false
+        for _, k in pairs(allowedKeys) do
+            if Value == k then
+                success = true
+                break
+            end
+        end
+        if success then
+            -- Unlock all tabs
+            Tabs.Home:SetDisabled(false)
+            Tabs.Scripts:SetDisabled(false)
+            Tabs.Settings:SetDisabled(false)
+            Fluent:Notify({Title = "Access Granted", Content = "Welcome to Sweb Hub!", Duration = 5})
+            Window:SelectTab(Tabs.Home) -- Switch to Home automatically
+        else
+            Fluent:Notify({Title = "Invalid Key", Content = "Please try again!", Duration = 5})
+        end
+    end
+})
+
+-- =========================
+-- Home Tab
 -- =========================
 Tabs.Home:AddParagraph({
     Title = "Sweb Hub",
@@ -114,7 +71,7 @@ Tabs.Home:AddParagraph({
 })
 
 -- =========================
--- 📂 Scripts Tab
+-- Scripts Tab
 -- =========================
 local scripts = {
     {Name = "Script 1", URL = "https://pastebin.com/raw/XXXXXX"},
@@ -154,10 +111,4 @@ SaveManager:SetFolder("FluentScriptHub/specific-game")
 InterfaceManager:BuildInterfaceSection(Tabs.Settings)
 SaveManager:BuildConfigSection(Tabs.Settings)
 
-Window:SelectTab(1) -- Open Home tab by default
-
-Fluent:Notify({
-    Title = "Sweb Hub",
-    Content = "The hub has been loaded successfully!",
-    Duration = 8
-})
+Window:SelectTab(Tabs.Key) -- Start with key input tab
