@@ -87,7 +87,7 @@ Tabs.NFLUniverse:AddButton({
     end
 })
 
--- ===== Settings Tab (Save + Configs) =====
+-- ===== Settings Tab (Save + Configs + Discord Button) =====
 SaveManager:SetLibrary(Fluent)
 InterfaceManager:SetLibrary(Fluent)
 SaveManager:IgnoreThemeSettings()
@@ -96,6 +96,23 @@ InterfaceManager:SetFolder("MASTXRHub")
 SaveManager:SetFolder("MASTXRHub/specific-game")
 InterfaceManager:BuildInterfaceSection(Tabs.Settings)
 SaveManager:BuildConfigSection(Tabs.Settings)
+
+-- Discord button
+Tabs.Settings:AddButton({
+    Title = "Join our Discord",
+    Icon = "discord",
+    Description = "Click to copy the invite",
+    Callback = function()
+        local invite = "https://discord.gg/s2QBMdTF6G"
+        pcall(function() if setclipboard then setclipboard(invite) end end)
+        Fluent:Notify({
+            Title = "MASTXR Hub",
+            Content = "Discord invite copied to clipboard!",
+            SubContent = invite,
+            Duration = 6
+        })
+    end
+})
 
 -- Default Tab + Notify
 Window:SelectTab(1)
