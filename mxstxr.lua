@@ -1,175 +1,152 @@
--- MASTXR GUI Hub
-local Library = require(game:GetService("ReplicatedStorage"):WaitForChild("Fluent"):WaitForChild("MainModule"))
+--[[ 
+    SCRIPT HUB - Multi-Script Loader with Key System
+    WARNING: Use at your own risk
+--]]
 
--- Create the main window
-local Window = Library:Window{
-    Title = `MASTXR {Library.Version}`,
-    SubTitle = "by Sweb & Team",
-    TabWidth = 160,
-    Size = UDim2.fromOffset(830, 525),
-    Resize = true,
-    Acrylic = true,
-    Theme = "Vynixu",
-    MinimizeKey = Enum.KeyCode.P
-}
+-- =========================
+-- 🔑 Key System
+-- =========================
+local allowedKeys = {"sweb123"} -- add more keys if needed
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local GuiService = game:GetService("StarterGui")
 
--- Create tabs
-local Tabs = {
-    Main = Window:Tab{Title = "Main", Icon = "phosphor-users-bold"},
-    Settings = Window:Tab{Title = "Settings", Icon = "settings"}
-}
+-- Simple GUI input for key (using TextBox)
+local function requestKey()
+    local ScreenGui = Instance.new("ScreenGui")
+    ScreenGui.Name = "KeyPromptGui"
+    ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
 
--- ===== Main Tab Components =====
+    local Frame = Instance.new("Frame")
+    Frame.Size = UDim2.new(0, 300, 0, 150)
+    Frame.Position = UDim2.new(0.5, -150, 0.5, -75)
+    Frame.BackgroundColor3 = Color3.fromRGB(25,25,25)
+    Frame.BorderSizePixel = 0
+    Frame.Parent = ScreenGui
 
--- Paragraph examples
-local Paragraph = Tabs.Main:Paragraph("Paragraph", {
-    Title = "Paragraph",
-    Content = "This is a paragraph.\nSecond line!"
-})
-Paragraph:SetValue("This paragraph text is changed!")
+    local UICorner = Instance.new("UICorner")
+    UICorner.CornerRadius = UDim.new(0, 10)
+    UICorner.Parent = Frame
 
-Tabs.Main:Paragraph("AlignedParagraph", {
-    Title = "Paragraph",
-    Content = "This is a paragraph with a center alignment!",
-    TitleAlignment = "Middle",
-    ContentAlignment = Enum.TextXAlignment.Center
-})
+    local Title = Instance.new("TextLabel")
+    Title.Text = "Enter Key"
+    Title.Size = UDim2.new(1,0,0,50)
+    Title.BackgroundTransparency = 1
+    Title.TextScaled = true
+    Title.TextColor3 = Color3.fromRGB(255,255,255)
+    Title.Font = Enum.Font.SourceSansBold
+    Title.Parent = Frame
 
--- Buttons
-Tabs.Main:Button({
-    Title = "Show Dialog",
-    Description = "Click to open a dialog",
-    Callback = function()
-        local D = Window:Dialog({
-            Title = "Dialog Title",
-            Content = "This is a sample dialog.",
-            Buttons = {
-                {Title = "Confirm", Callback = function()
-                    Window:Dialog({
-                        Title = "Another Dialog",
-                        Content = "Example nested dialog content.",
-                        Buttons = {{Title = "Ok", Callback = function() print("Ok pressed") end}}
-                    })
-                end},
-                {Title = "Cancel", Callback = function() print("Dialog cancelled") end}
-            }
-        })
-        D.Closed:Wait()
-        print("Dialog closed")
-    end
-})
+    local TextBox = Instance.new("TextBox")
+    TextBox.PlaceholderText = "Key here..."
+    TextBox.Size = UDim2.new(1, -20, 0, 50)
+    TextBox.Position = UDim2.new(0,10,0,60)
+    TextBox.BackgroundColor3 = Color3.fromRGB(40,40,40)
+    TextBox.TextColor3 = Color3.fromRGB(255,255,255)
+    TextBox.Font = Enum.Font.SourceSans
+    TextBox.TextScaled = true
+    TextBox.Parent = Frame
 
-Tabs.Main:Button({
-    Title = "Error Button Example",
-    Description = "This prints an error intentionally",
-    Callback = function()
-        print("Hello, "..tostring("World").."!")
-    end
-})
+    local Submit = Instance.new("TextButton")
+    Submit.Text = "Submit"
+    Submit.Size = UDim2.new(0, 100, 0, 30)
+    Submit.Position = UDim2.new(0.5, -50, 1, -40)
+    Submit.BackgroundColor3 = Color3.fromRGB(255,0,0)
+    Submit.TextColor3 = Color3.fromRGB(255,255,255)
+    Submit.Font = Enum.Font.SourceSansBold
+    Submit.TextScaled = true
+    Submit.Parent = Frame
 
--- Toggles
-local Toggle = Tabs.Main:Toggle("DemoToggle", {Title = "Toggle", Default = false})
-Toggle:OnChanged(function()
-    print("Toggle changed:", Library.Options["DemoToggle"].Value)
-end)
-
--- Sliders
-local Slider = Tabs.Main:Slider("DemoSlider", {
-    Title = "Slider",
-    Description = "Demo slider",
-    Default = 2.0,
-    Min = 0.0,
-    Max = 15.5,
-    Rounding = 1
-})
-Slider.Value = 4.5
-Slider:OnChanged(function(Value)
-    print("Slider changed:", Value)
-end)
-
--- Dropdowns
-local Dropdown = Tabs.Main:Dropdown("DemoDropdown", {
-    Title = "Dropdown",
-    Values = {"one","two","three","four","five","six","seven","eight","nine","ten"},
-    Multi = false,
-    Default = 1
-})
-Dropdown:SetValue("four")
-Dropdown:OnChanged(function(Value)
-    print("Dropdown changed:", Value)
-end)
-
-local MultiDropdown = Tabs.Main:Dropdown("DemoMultiDropdown", {
-    Title = "MultiDropdown",
-    Description = "Select multiple values",
-    Values = {"one","two","three","four","five"},
-    Multi = true,
-    Default = {"two","five"}
-})
-MultiDropdown:SetValue({one=true, three=true})
-MultiDropdown:OnChanged(function(Value)
-    local Values = {}
-    for K, V in next, Value do table.insert(Values, K) end
-    print("MultiDropdown changed:", table.concat(Values, ", "))
-end)
-
--- Colorpickers
-local Colorpicker = Tabs.Main:Colorpicker("DemoColorpicker", {Title = "Colorpicker", Default = Color3.fromRGB(96,205,255)})
-Colorpicker:OnChanged(function()
-    print("Colorpicker changed:", Colorpicker.Value)
-end)
-
-local TColorpicker = Tabs.Main:Colorpicker("DemoTransColorpicker", {Title="TransparencyColorpicker", Transparency=0, Default=Color3.fromRGB(96,205,255)})
-TColorpicker:OnChanged(function()
-    print("TColorpicker changed:", TColorpicker.Value, "Transparency:", TColorpicker.Transparency)
-end)
-
-local CColorpicker = Tabs.Main:Colorpicker("DemoUpdateColorpicker", {Title="Realtime Colorpicker", Transparency=0, Default=Color3.fromRGB(96,205,255), UpdateOnChange=true})
-CColorpicker:OnChanged(function()
-    print("Realtime Colorpicker changed:", CColorpicker.Value, "Transparency:", CColorpicker.Transparency)
-end)
-
--- Keybind
-local Keybind = Tabs.Main:Keybind("DemoKeybind", {Title="KeyBind", Mode="Hold", Default="LeftControl", ChangedCallback=function(New) print("Keybind changed:", New) end})
-task.spawn(function()
-    while true do
-        wait(1)
-        if Keybind:GetState() then
-            print("Keybind is being held down")
+    local keyValid = false
+    local connection
+    connection = Submit.MouseButton1Click:Connect(function()
+        local inputKey = TextBox.Text
+        for _, validKey in pairs(allowedKeys) do
+            if inputKey == validKey then
+                keyValid = true
+                break
+            end
         end
-        if Library.Unloaded then break end
-    end
-end)
+        if keyValid then
+            ScreenGui:Destroy()
+        else
+            TextBox.Text = ""
+            TextBox.PlaceholderText = "Invalid Key!"
+        end
+    end)
 
--- Input boxes
-local Input = Tabs.Main:Input("DemoInput", {Title="Input", Default="Default", Numeric=false, Finished=false, Placeholder="Placeholder", Callback=function(Value) print("Input changed:", Value) end})
-local InputLostFocus = Tabs.Main:Input("DemoInputFocus", {Title="InputFocusLost", Default="Default", ClearOnFocusLost=true, Numeric=false, Finished=true, Placeholder="Placeholder", Callback=function(Value) print("Input changed:", Value) end})
-
--- ===== Settings Tab =====
-local InterfaceSection = Tabs.Settings:Section("Interface")
-
--- Theme Dropdown
-InterfaceSection:Dropdown("InterfaceTheme", {Title="Theme", Description="Change theme", Values=Library.Themes, Default=Library.Theme, Callback=function(Value) Library:SetTheme(Value) end})
-
--- Acrylic toggle
-if Library.UseAcrylic then
-    InterfaceSection:Toggle("AcrylicToggle", {Title="Acrylic", Description="Blurred background requires graphic quality 8+", Default=Library.Acrylic, Callback=function(Value) Library:ToggleAcrylic(Value) end})
+    repeat wait() until keyValid
 end
 
--- Transparency toggle
-InterfaceSection:Toggle("TransparentToggle", {Title="Transparency", Description="Makes the interface transparent.", Default=Library.Transparency, Callback=function(Value) Library:ToggleTransparency(Value) end})
+requestKey() -- run key system before loading hub
 
--- Minimize keybind
-InterfaceSection:Keybind("MenuKeybind", {Title="Minimize Bind", Default=Library.MinimizeKey or Enum.KeyCode.RightShift, ChangedCallback=function(Value) Library.MinimizeKey = Value end})
-Library.MinimizeKeybind = Library.Options.MenuKeybind
+-- =========================
+-- 🔧 Load RedzLib GUI
+-- =========================
+local redzlib = loadstring(game:HttpGet("https://gist.githubusercontent.com/MjContiga1/54c07e52fc2aab8873b68d91a71d11c6/raw/fb4f1d6a7c89465f3b39bc00eeff09af24b88f20/Redz%2520hub.lua"))()
 
--- Select first tab by default
-Window:SelectTab(1)
-
--- Notification on load
-Library:Notify({
-    Title = "MASTXR",
-    Content = "The MASTXR script hub has been loaded successfully.",
-    Duration = 8,
-    Sound = {SoundId = "rbxassetid://8486683243"}
+-- Create main window
+local Window = redzlib:MakeWindow({
+    Title = "Sweb Hub",
+    SubTitle = "Multi-Script Loader",
+    SaveFolder = "SwebHub"
 })
+
+Window:AddMinimizeButton({
+    Button = { Image = "rbxassetid://139438145143663", BackgroundTransparency = 0 },
+    Corner = { CornerRadius = UDim.new(35, 1) },
+})
+
+-- =========================
+-- 🏠 Home Tab
+-- =========================
+local HomeTab = Window:MakeTab({"Home", "rbxassetid://7733960981"})
+Window:SelectTab(HomeTab)
+
+local SectionHome = HomeTab:AddSection({"Credits"})
+HomeTab:AddParagraph({"Sweb Hub", "Created by Top1 Sweb\nDiscord: @4503\nUse at your own risk!"})
+
+-- =========================
+-- 📂 Scripts Tab
+-- =========================
+local ScriptsTab = Window:MakeTab({"Scripts", "rbxassetid://7743875962"})
+Window:SelectTab(ScriptsTab)
+
+local SectionScripts = ScriptsTab:AddSection({"Available Scripts"})
+
+-- Example Script Buttons (replace URLs with your actual scripts)
+ScriptsTab:AddButton({"Script 1", function()
+    loadstring(game:HttpGet("https://pastebin.com/raw/XXXXXX"))()
+end})
+
+ScriptsTab:AddButton({"Script 2", function()
+    loadstring(game:HttpGet("https://pastebin.com/raw/YYYYYY"))()
+end})
+
+ScriptsTab:AddButton({"Script 3", function()
+    loadstring(game:HttpGet("https://pastebin.com/raw/ZZZZZZ"))()
+end})
+
+ScriptsTab:AddButton({"Script 4", function()
+    loadstring(game:HttpGet("https://pastebin.com/raw/AAAAAA"))()
+end})
+
+ScriptsTab:AddButton({"Script 5", function()
+    loadstring(game:HttpGet("https://pastebin.com/raw/BBBBBB"))()
+end})
+
+-- =========================
+-- ✅ Optional: Dialog Example
+-- =========================
+ScriptsTab:AddButton({"Test Dialog", function()
+    Window:Dialog({
+        Title = "Test",
+        Text = "This is a test dialog!",
+        Options = {{"OK", function() end}}
+    })
+end})
+
+-- =========================
+-- HUB READY
+-- =========================
+print("Sweb Hub Loaded Successfully!")
