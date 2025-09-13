@@ -21,6 +21,7 @@ local Tabs = {
     Hypershot     = Window:AddTab({ Title = "Hypershot", Icon = "crosshair" }),
     NFLUniverse   = Window:AddTab({ Title = "NFL Universe", Icon = "shield" }),
     CustomScripts = Window:AddTab({ Title = "Custom Scripts", Icon = "code" }),
+    UserScripts   = Window:AddTab({ Title = "User Scripts", Icon = "user" }),
     Settings      = Window:AddTab({ Title = "Settings", Icon = "settings" })
 }
 
@@ -96,7 +97,6 @@ Tabs.NFLUniverse:AddButton({
 })
 
 -- ===== Custom Scripts Tab =====
--- Load Script from URL
 local URLInput = Tabs.CustomScripts:AddInput({
     Title = "Script URL",
     Placeholder = "https://example.com/script.lua",
@@ -123,7 +123,6 @@ Tabs.CustomScripts:AddButton({
     end
 })
 
--- Paste LUA Code
 local LuaInput = Tabs.CustomScripts:AddInput({
     Title = "Paste LUA Code",
     Placeholder = "-- paste your Lua code here",
@@ -151,6 +150,72 @@ Tabs.CustomScripts:AddButton({
     end
 })
 
+-- ===== User Scripts Tab =====
+local UserScriptsFolder = "MASTXRHub/UserScripts"
+SaveManager:SetFolder(UserScriptsFolder)
+SaveManager:BuildConfigSection(Tabs.UserScripts)
+
+local ScriptNameInput = Tabs.UserScripts:AddInput({
+    Title = "Script Name",
+    Placeholder = "Enter a name",
+    Text = ""
+})
+
+local ScriptContentInput = Tabs.UserScripts:AddInput({
+    Title = "Script URL or LUA",
+    Placeholder = "Paste URL or Lua code",
+    Text = "",
+    MultiLine = true
+})
+
+Tabs.UserScripts:AddButton({
+    Title = "Add Script",
+    Description = "Save this script to the hub",
+    Callback = function()
+        local name = ScriptNameInput:GetText()
+        local code = ScriptContentInput:GetText()
+        if name ~= "" and code ~= "" then
+            SaveManager:Set(name, code)
+            SaveManager:SaveConfig("UserScripts")
+            Tabs.UserScripts:AddButton({
+                Title = name,
+                Description = "Click to run",
+                Callback = function()
+                    pcall(function()
+                        if code:sub(1,4) == "http" then
+                            loadstring(game:HttpGet(code, true))()
+                        else
+                            loadstring(code)()
+                        end
+                        Window:Destroy()
+                    end)
+                end
+            })
+            Fluent:Notify({Title="MASTXR Hub", Content="Script added successfully!", Duration=4})
+        else
+            Fluent:Notify({Title="MASTXR Hub", Content="Please enter a name and a script!", Duration=4})
+        end
+    end
+})
+
+-- Load saved user scripts
+for name, code in pairs(SaveManager:GetAll()) do
+    Tabs.UserScripts:AddButton({
+        Title = name,
+        Description = "Click to run",
+        Callback = function()
+            pcall(function()
+                if code:sub(1,4) == "http" then
+                    loadstring(game:HttpGet(code, true))()
+                else
+                    loadstring(code)()
+                end
+                Window:Destroy()
+            end)
+        end
+    })
+end
+
 -- ===== Settings Tab =====
 SaveManager:SetLibrary(Fluent)
 InterfaceManager:SetLibrary(Fluent)
@@ -161,7 +226,6 @@ SaveManager:SetFolder("MASTXRHub/specific-game")
 InterfaceManager:BuildInterfaceSection(Tabs.Settings)
 SaveManager:BuildConfigSection(Tabs.Settings)
 
--- Discord button
 Tabs.Settings:AddButton({
     Title = "Join our Discord",
     Icon = "discord",
@@ -169,21 +233,12 @@ Tabs.Settings:AddButton({
     Callback = function()
         local invite = "https://discord.gg/s2QBMdTF6G"
         pcall(function() if setclipboard then setclipboard(invite) end end)
-        Fluent:Notify({
-            Title = "MASTXR Hub",
-            Content = "Discord invite copied to clipboard!",
-            SubContent = invite,
-            Duration = 6
-        })
+        Fluent:Notify({Title="MASTXR Hub", Content="Discord invite copied to clipboard!", SubContent=invite, Duration=6})
     end
 })
 
 -- Default Tab + Notify
 Window:SelectTab(1)
-Fluent:Notify({
-    Title = "MASTXR Hub",
-    Content = "The script hub has been loaded!",
-    Duration = 8
-})
+Fluent:Notify({Title="MASTXR Hub", Content="The script hub has been loaded!", Duration=8})
 
 SaveManager:LoadAutoloadConfig()
