@@ -6,7 +6,7 @@ local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.
 -- Main Window
 local Window = Fluent:CreateWindow({
     Title = "MASTXR Hub " .. Fluent.Version,
-    SubTitle = "by Top1 Sweb",
+    SubTitle = "by Sweb @4503",
     TabWidth = 160,
     Size = UDim2.fromOffset(580, 460),
     Acrylic = true,
@@ -14,39 +14,28 @@ local Window = Fluent:CreateWindow({
     MinimizeKey = Enum.KeyCode.LeftControl
 })
 
--- Tabs
+-- Tabs (with icons)
 local Tabs = {
-    StealBrainrot = Window:AddTab({ Title = "Steal Brainrot", Icon = "brain" }),
-    Rivals = Window:AddTab({ Title = "Rivals", Icon = "swords" }),
-    Hypershot = Window:AddTab({ Title = "Hypershot", Icon = "crosshair" }), -- Added an icon
-    Settings = Window:AddTab({ Title = "Settings", Icon = "settings" })
+    StealBrainrot = Window:AddTab({ Title = "Steal Brainrot", Icon = "brain" }),   -- brain icon
+    Rivals        = Window:AddTab({ Title = "Rivals", Icon = "swords" }),         -- crossed swords icon
+    Hypershot     = Window:AddTab({ Title = "Hypershot", Icon = "crosshair" }),   -- crosshair icon
+    Settings      = Window:AddTab({ Title = "Settings", Icon = "settings" })      -- gear icon
 }
 
--- Steal Brainrot Tab
-Tabs.StealBrainrot:AddButton({
-    Title = "Execute Script",
-    Description = "Run Steal Brainrot",
-    Callback = function()
-        loadstring(game:HttpGet("https://pastebin.com/raw/your_steal_brainrot_script"))()
-    end
+-- Placeholders (empty for now, we’ll add scripts later)
+Tabs.StealBrainrot:AddParagraph({
+    Title = "Coming Soon",
+    Content = "Steal Brainrot scripts will be added here."
 })
 
--- Rivals Tab
-Tabs.Rivals:AddButton({
-    Title = "Execute Script",
-    Description = "Run Rivals Script",
-    Callback = function()
-        loadstring(game:HttpGet("https://pastebin.com/raw/your_rivals_script"))()
-    end
+Tabs.Rivals:AddParagraph({
+    Title = "Coming Soon",
+    Content = "Rivals scripts will be added here."
 })
 
--- Hypershot Tab
-Tabs.Hypershot:AddButton({
-    Title = "Execute Script",
-    Description = "Run Hypershot Script",
-    Callback = function()
-        loadstring(game:HttpGet("https://pastebin.com/raw/your_hypershot_script"))()
-    end
+Tabs.Hypershot:AddParagraph({
+    Title = "Coming Soon",
+    Content = "Hypershot scripts will be added here."
 })
 
 -- Settings (Save + Configs)
