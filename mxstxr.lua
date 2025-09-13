@@ -36,10 +36,10 @@ end
 
 -- ===== Steal Brainrot Tab =====
 Tabs.StealBrainrot:AddButton({
-    Title = "COMING SOON!!!",
-    Description = "Steal Brainrot - Main Script",
+    Title = "Steal A Brainrot Script",
+    Description = "Main Script",
     Callback = function()
-        loadstring(game:HttpGet("https://pastebin.com/raw/your_steal_brainrot_script1"))()
+        loadstring(game:HttpGet('https://raw.githubusercontent.com/KaspikScriptsRb/steal-a-brainrot/refs/heads/main/.lua'))()
         Window:Destroy()
     end
 })
