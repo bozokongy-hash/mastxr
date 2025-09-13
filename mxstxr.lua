@@ -16,78 +16,85 @@ local Window = Fluent:CreateWindow({
 
 -- Tabs (all with working icons)
 local Tabs = {
-    StealBrainrot = Window:AddTab({ Title = "Steal Brainrot", Icon = "cpu" }),     -- 🖥️ CPU icon
-    Rivals        = Window:AddTab({ Title = "Rivals", Icon = "swords" }),         -- ⚔️ swords
-    Hypershot     = Window:AddTab({ Title = "Hypershot", Icon = "crosshair" }),   -- 🎯 crosshair
-    NFLUniverse   = Window:AddTab({ Title = "NFL Universe", Icon = "shield" }),   -- 🛡️ shield icon
-    Settings      = Window:AddTab({ Title = "Settings", Icon = "settings" })      -- ⚙️ gear
+    StealBrainrot = Window:AddTab({ Title = "Steal Brainrot", Icon = "cpu" }),
+    Rivals        = Window:AddTab({ Title = "Rivals", Icon = "swords" }),
+    Hypershot     = Window:AddTab({ Title = "Hypershot", Icon = "crosshair" }),
+    NFLUniverse   = Window:AddTab({ Title = "NFL Universe", Icon = "shield" }),
+    Settings      = Window:AddTab({ Title = "Settings", Icon = "settings" })
 }
 
--- ===== Steal Brainrot Tab (2 scripts) =====
+-- Helper function for "Coming Soon"
+local function ComingSoon(title)
+    return function()
+        Fluent:Notify({
+            Title = "MASTXR Hub",
+            Content = title .. " is coming soon!",
+            Duration = 4
+        })
+    end
+end
+
+-- ===== Steal Brainrot Tab =====
 Tabs.StealBrainrot:AddButton({
     Title = "Script 1",
     Description = "Steal Brainrot - Main Script",
     Callback = function()
         loadstring(game:HttpGet("https://pastebin.com/raw/your_steal_brainrot_script1"))()
+        Window:Destroy()
     end
 })
 Tabs.StealBrainrot:AddButton({
     Title = "Script 2",
-    Description = "Steal Brainrot - Extra",
-    Callback = function()
-        loadstring(game:HttpGet("https://pastebin.com/raw/your_steal_brainrot_script2"))()
-    end
+    Description = "Coming Soon",
+    Callback = ComingSoon("Steal Brainrot Script 2")
 })
 
--- ===== Rivals Tab (2 scripts) =====
+-- ===== Rivals Tab =====
 Tabs.Rivals:AddButton({
     Title = "ZYPHERION Rivals Script",
     Description = "Rivals - Main Script",
     Callback = function()
         loadstring(game:HttpGet('https://raw.githubusercontent.com/blackowl1231/ZYPHERION/refs/heads/main/main.lua'))()
+        Window:Destroy()
     end
 })
 Tabs.Rivals:AddButton({
     Title = "Script 2",
-    Description = "Rivals - Extra",
-    Callback = function()
-        loadstring(game:HttpGet("https://pastebin.com/raw/your_rivals_script2"))()
-    end
+    Description = "Coming Soon",
+    Callback = ComingSoon("Rivals Script 2")
 })
 
--- ===== Hypershot Tab (2 scripts) =====
+-- ===== Hypershot Tab =====
 Tabs.Hypershot:AddButton({
     Title = "Script 1",
     Description = "Hypershot - Main Script",
     Callback = function()
         loadstring(game:HttpGet("https://pastebin.com/raw/your_hypershot_script1"))()
+        Window:Destroy()
     end
 })
 Tabs.Hypershot:AddButton({
     Title = "Script 2",
-    Description = "Hypershot - Extra",
-    Callback = function()
-        loadstring(game:HttpGet("https://pastebin.com/raw/your_hypershot_script2"))()
-    end
+    Description = "Coming Soon",
+    Callback = ComingSoon("Hypershot Script 2")
 })
 
--- ===== NFL Universe Tab (2 scripts) =====
+-- ===== NFL Universe Tab =====
 Tabs.NFLUniverse:AddButton({
     Title = "Script 1",
     Description = "NFL Universe - Main Script",
     Callback = function()
         loadstring(game:HttpGet("https://pastebin.com/raw/your_nfl_script1"))()
+        Window:Destroy()
     end
 })
 Tabs.NFLUniverse:AddButton({
     Title = "Script 2",
-    Description = "NFL Universe - Extra",
-    Callback = function()
-        loadstring(game:HttpGet("https://pastebin.com/raw/your_nfl_script2"))()
-    end
+    Description = "Coming Soon",
+    Callback = ComingSoon("NFL Universe Script 2")
 })
 
--- ===== Settings Tab (Save + Configs + Discord Button) =====
+-- ===== Settings Tab =====
 SaveManager:SetLibrary(Fluent)
 InterfaceManager:SetLibrary(Fluent)
 SaveManager:IgnoreThemeSettings()
