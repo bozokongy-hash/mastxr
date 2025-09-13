@@ -20,6 +20,7 @@ local Tabs = {
     Rivals        = Window:AddTab({ Title = "Rivals", Icon = "swords" }),
     Hypershot     = Window:AddTab({ Title = "Hypershot", Icon = "crosshair" }),
     NFLUniverse   = Window:AddTab({ Title = "NFL Universe", Icon = "shield" }),
+    CustomScripts = Window:AddTab({ Title = "Custom Scripts", Icon = "code" }),
     Settings      = Window:AddTab({ Title = "Settings", Icon = "settings" })
 }
 
@@ -52,7 +53,7 @@ Tabs.StealBrainrot:AddButton({
 -- ===== Rivals Tab =====
 Tabs.Rivals:AddButton({
     Title = "ZYPHERION Rivals Script",
-    Description = "Rivals - Main Script",
+    Description = "Main Script",
     Callback = function()
         loadstring(game:HttpGet('https://raw.githubusercontent.com/blackowl1231/ZYPHERION/refs/heads/main/main.lua'))()
         Window:Destroy()
@@ -67,7 +68,7 @@ Tabs.Rivals:AddButton({
 -- ===== Hypershot Tab =====
 Tabs.Hypershot:AddButton({
     Title = "Zephyr Hypershot Script",
-    Description = "Hypershot - Main Script",
+    Description = "Main Script",
     Callback = function()
         loadstring(game:HttpGet("https://raw.githubusercontent.com/TheRealAvrwm/Zephyr-V2/refs/heads/main/Hypershot.lua", true))()
         Window:Destroy()
@@ -81,8 +82,8 @@ Tabs.Hypershot:AddButton({
 
 -- ===== NFL Universe Tab =====
 Tabs.NFLUniverse:AddButton({
-    Title = "COMING SOON!!!",
-    Description = "NFL Universe - Main Script",
+    Title = "Script 1",
+    Description = "Main Script",
     Callback = function()
         loadstring(game:HttpGet("https://pastebin.com/raw/your_nfl_script1"))()
         Window:Destroy()
@@ -92,6 +93,62 @@ Tabs.NFLUniverse:AddButton({
     Title = "Script 2",
     Description = "Coming Soon",
     Callback = ComingSoon("NFL Universe Script 2")
+})
+
+-- ===== Custom Scripts Tab =====
+-- Load Script from URL
+local URLInput = Tabs.CustomScripts:AddInput({
+    Title = "Script URL",
+    Placeholder = "https://example.com/script.lua",
+    Text = ""
+})
+
+Tabs.CustomScripts:AddButton({
+    Title = "Run Script URL",
+    Description = "Execute a Lua script from the URL above",
+    Callback = function()
+        local url = URLInput:GetText()
+        if url and url ~= "" then
+            pcall(function()
+                loadstring(game:HttpGet(url, true))()
+                Window:Destroy()
+            end)
+        else
+            Fluent:Notify({
+                Title = "MASTXR Hub",
+                Content = "Please enter a valid script URL!",
+                Duration = 4
+            })
+        end
+    end
+})
+
+-- Paste LUA Code
+local LuaInput = Tabs.CustomScripts:AddInput({
+    Title = "Paste LUA Code",
+    Placeholder = "-- paste your Lua code here",
+    Text = "",
+    MultiLine = true
+})
+
+Tabs.CustomScripts:AddButton({
+    Title = "Run LUA Code",
+    Description = "Execute the Lua code above",
+    Callback = function()
+        local code = LuaInput:GetText()
+        if code and code ~= "" then
+            pcall(function()
+                loadstring(code)()
+                Window:Destroy()
+            end)
+        else
+            Fluent:Notify({
+                Title = "MASTXR Hub",
+                Content = "Please enter some Lua code!",
+                Duration = 4
+            })
+        end
+    end
 })
 
 -- ===== Settings Tab =====
