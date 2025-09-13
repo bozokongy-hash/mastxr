@@ -36,7 +36,7 @@ end
 
 -- ===== Steal Brainrot Tab =====
 Tabs.StealBrainrot:AddButton({
-    Title = "Script 1",
+    Title = "COMING SOON!!!",
     Description = "Steal Brainrot - Main Script",
     Callback = function()
         loadstring(game:HttpGet("https://pastebin.com/raw/your_steal_brainrot_script1"))()
@@ -81,7 +81,7 @@ Tabs.Hypershot:AddButton({
 
 -- ===== NFL Universe Tab =====
 Tabs.NFLUniverse:AddButton({
-    Title = "Script 1",
+    Title = "COMING SOON!!!",
     Description = "NFL Universe - Main Script",
     Callback = function()
         loadstring(game:HttpGet("https://pastebin.com/raw/your_nfl_script1"))()
