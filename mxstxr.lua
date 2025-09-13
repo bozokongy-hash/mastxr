@@ -16,7 +16,7 @@ local Window = Fluent:CreateWindow({
 
 -- Tabs (all with icons)
 local Tabs = {
-    StealBrainrot = Window:AddTab({ Title = "Steal Brainrot", Icon = "skull" }),   -- 💀 Skull
+    StealBrainrot = Window:AddTab({ Title = "Steal Brainrot", Icon = "cpu" }),   -- cpu
     Rivals        = Window:AddTab({ Title = "Rivals", Icon = "swords" }),         -- ⚔️ Swords
     Hypershot     = Window:AddTab({ Title = "Hypershot", Icon = "crosshair" }),   -- 🎯 Crosshair
     Settings      = Window:AddTab({ Title = "Settings", Icon = "settings" })      -- ⚙️ Gear
