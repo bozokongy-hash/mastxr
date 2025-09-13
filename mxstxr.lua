@@ -6,7 +6,7 @@ local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.
 -- Main Window
 local Window = Fluent:CreateWindow({
     Title = "MASTXR Hub " .. Fluent.Version,
-    SubTitle = "by Top1 Sweb",
+    SubTitle = "by @4503 / @bc_ieef",
     TabWidth = 160,
     Size = UDim2.fromOffset(580, 460),
     Acrylic = true,
