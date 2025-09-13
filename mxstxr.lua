@@ -14,15 +14,15 @@ local Window = Fluent:CreateWindow({
     MinimizeKey = Enum.KeyCode.LeftControl
 })
 
--- Tabs (with icons)
+-- Tabs (all with icons)
 local Tabs = {
-    StealBrainrot = Window:AddTab({ Title = "Steal Brainrot", Icon = "brain" }),   -- brain icon
-    Rivals        = Window:AddTab({ Title = "Rivals", Icon = "swords" }),         -- crossed swords icon
-    Hypershot     = Window:AddTab({ Title = "Hypershot", Icon = "crosshair" }),   -- crosshair icon
-    Settings      = Window:AddTab({ Title = "Settings", Icon = "settings" })      -- gear icon
+    StealBrainrot = Window:AddTab({ Title = "Steal Brainrot", Icon = "skull" }),   -- 💀 Skull
+    Rivals        = Window:AddTab({ Title = "Rivals", Icon = "swords" }),         -- ⚔️ Swords
+    Hypershot     = Window:AddTab({ Title = "Hypershot", Icon = "crosshair" }),   -- 🎯 Crosshair
+    Settings      = Window:AddTab({ Title = "Settings", Icon = "settings" })      -- ⚙️ Gear
 }
 
--- Placeholders (empty for now, we’ll add scripts later)
+-- Placeholders (we’ll add scripts after)
 Tabs.StealBrainrot:AddParagraph({
     Title = "Coming Soon",
     Content = "Steal Brainrot scripts will be added here."
