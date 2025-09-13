@@ -6,7 +6,7 @@ local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.
 -- Main Window
 local Window = Fluent:CreateWindow({
     Title = "MASTXR Hub " .. Fluent.Version,
-    SubTitle = "by Sweb @4503",
+    SubTitle = "by Top1 Sweb",
     TabWidth = 160,
     Size = UDim2.fromOffset(580, 460),
     Acrylic = true,
@@ -16,26 +16,61 @@ local Window = Fluent:CreateWindow({
 
 -- Tabs (all with icons)
 local Tabs = {
-    StealBrainrot = Window:AddTab({ Title = "Steal Brainrot", Icon = "cpu" }),   -- cpu
-    Rivals        = Window:AddTab({ Title = "Rivals", Icon = "swords" }),         -- ⚔️ Swords
-    Hypershot     = Window:AddTab({ Title = "Hypershot", Icon = "crosshair" }),   -- 🎯 Crosshair
-    Settings      = Window:AddTab({ Title = "Settings", Icon = "settings" })      -- ⚙️ Gear
+    StealBrainrot = Window:AddTab({ Title = "Steal Brainrot", Icon = "zap" }),     -- ⚡ zap icon
+    Rivals        = Window:AddTab({ Title = "Rivals", Icon = "swords" }),         -- ⚔️ swords
+    Hypershot     = Window:AddTab({ Title = "Hypershot", Icon = "crosshair" }),   -- 🎯 crosshair
+    Settings      = Window:AddTab({ Title = "Settings", Icon = "settings" })      -- ⚙️ gear
 }
 
--- Placeholders (we’ll add scripts after)
-Tabs.StealBrainrot:AddParagraph({
-    Title = "Coming Soon",
-    Content = "Steal Brainrot scripts will be added here."
+-- Steal Brainrot Tab (2 scripts)
+Tabs.StealBrainrot:AddButton({
+    Title = "Script 1",
+    Description = "Steal Brainrot - Main Script",
+    Callback = function()
+        loadstring(game:HttpGet("https://pastebin.com/raw/your_steal_brainrot_script1"))()
+    end
 })
 
-Tabs.Rivals:AddParagraph({
-    Title = "Coming Soon",
-    Content = "Rivals scripts will be added here."
+Tabs.StealBrainrot:AddButton({
+    Title = "Script 2",
+    Description = "Steal Brainrot - Extra",
+    Callback = function()
+        loadstring(game:HttpGet("https://pastebin.com/raw/your_steal_brainrot_script2"))()
+    end
 })
 
-Tabs.Hypershot:AddParagraph({
-    Title = "Coming Soon",
-    Content = "Hypershot scripts will be added here."
+-- Rivals Tab (2 scripts)
+Tabs.Rivals:AddButton({
+    Title = "Script 1",
+    Description = "Rivals - Main Script",
+    Callback = function()
+        loadstring(game:HttpGet("https://pastebin.com/raw/your_rivals_script1"))()
+    end
+})
+
+Tabs.Rivals:AddButton({
+    Title = "Script 2",
+    Description = "Rivals - Extra",
+    Callback = function()
+        loadstring(game:HttpGet("https://pastebin.com/raw/your_rivals_script2"))()
+    end
+})
+
+-- Hypershot Tab (2 scripts)
+Tabs.Hypershot:AddButton({
+    Title = "Script 1",
+    Description = "Hypershot - Main Script",
+    Callback = function()
+        loadstring(game:HttpGet("https://pastebin.com/raw/your_hypershot_script1"))()
+    end
+})
+
+Tabs.Hypershot:AddButton({
+    Title = "Script 2",
+    Description = "Hypershot - Extra",
+    Callback = function()
+        loadstring(game:HttpGet("https://pastebin.com/raw/your_hypershot_script2"))()
+    end
 })
 
 -- Settings (Save + Configs)
