@@ -41,10 +41,10 @@ Tabs.StealBrainrot:AddButton({
 
 -- ===== Rivals Tab (2 scripts) =====
 Tabs.Rivals:AddButton({
-    Title = "Script 1",
+    Title = "ZYPHERION Rivals Script",
     Description = "Rivals - Main Script",
     Callback = function()
-        loadstring(game:HttpGet("https://pastebin.com/raw/your_rivals_script1"))()
+        loadstring(game:HttpGet('https://raw.githubusercontent.com/blackowl1231/ZYPHERION/refs/heads/main/main.lua'))()
     end
 })
 Tabs.Rivals:AddButton({
