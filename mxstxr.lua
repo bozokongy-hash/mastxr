@@ -28,11 +28,7 @@ local Tabs = {
 -- Helper function for "Coming Soon"
 local function ComingSoon(title)
     return function()
-        Fluent:Notify({
-            Title = "MASTXR Hub",
-            Content = title .. " is coming soon!",
-            Duration = 4
-        })
+        Fluent:Notify({Title="MASTXR Hub", Content=title.." is coming soon!", Duration=4})
     end
 end
 
@@ -114,11 +110,7 @@ Tabs.CustomScripts:AddButton({
                 Window:Destroy()
             end)
         else
-            Fluent:Notify({
-                Title = "MASTXR Hub",
-                Content = "Please enter a valid script URL!",
-                Duration = 4
-            })
+            Fluent:Notify({Title="MASTXR Hub", Content="Please enter a valid script URL!", Duration=4})
         end
     end
 })
@@ -141,11 +133,7 @@ Tabs.CustomScripts:AddButton({
                 Window:Destroy()
             end)
         else
-            Fluent:Notify({
-                Title = "MASTXR Hub",
-                Content = "Please enter some Lua code!",
-                Duration = 4
-            })
+            Fluent:Notify({Title="MASTXR Hub", Content="Please enter some Lua code!", Duration=4})
         end
     end
 })
@@ -217,15 +205,6 @@ for name, code in pairs(SaveManager:GetAll()) do
 end
 
 -- ===== Settings Tab =====
-SaveManager:SetLibrary(Fluent)
-InterfaceManager:SetLibrary(Fluent)
-SaveManager:IgnoreThemeSettings()
-SaveManager:SetIgnoreIndexes({})
-InterfaceManager:SetFolder("MASTXRHub")
-SaveManager:SetFolder("MASTXRHub/specific-game")
-InterfaceManager:BuildInterfaceSection(Tabs.Settings)
-SaveManager:BuildConfigSection(Tabs.Settings)
-
 Tabs.Settings:AddButton({
     Title = "Join our Discord",
     Icon = "discord",
@@ -236,6 +215,16 @@ Tabs.Settings:AddButton({
         Fluent:Notify({Title="MASTXR Hub", Content="Discord invite copied to clipboard!", SubContent=invite, Duration=6})
     end
 })
+
+-- Now build settings sections AFTER adding buttons
+InterfaceManager:SetLibrary(Fluent)
+SaveManager:SetLibrary(Fluent)
+SaveManager:IgnoreThemeSettings()
+SaveManager:SetIgnoreIndexes({})
+InterfaceManager:SetFolder("MASTXRHub")
+SaveManager:SetFolder("MASTXRHub/specific-game")
+InterfaceManager:BuildInterfaceSection(Tabs.Settings)
+SaveManager:BuildConfigSection(Tabs.Settings)
 
 -- Default Tab + Notify
 Window:SelectTab(1)
