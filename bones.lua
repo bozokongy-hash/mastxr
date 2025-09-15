@@ -1,5 +1,5 @@
--- Load Rayfield
-local Rayfield = loadstring(game:HttpGet('https://raw.githubusercontent.com/shlexware/Rayfield/main/source'))()
+-- Load Rayfield UI
+local Rayfield = loadstring(game:HttpGet('https://raw.githubusercontent.com/jensonhirst/Rayfield/main/source'))()
 
 -- Create the main window
 local Window = Rayfield:CreateWindow({
@@ -8,15 +8,15 @@ local Window = Rayfield:CreateWindow({
     LoadingSubtitle = "by Sweb",
     ConfigurationSaving = {
        Enabled = true,
-       FolderName = nil, -- Leave nil to use default
+       FolderName = nil, -- Uses default folder
        FileName = "CustomMenuConfig"
     },
     Discord = {
        Enabled = false,
-       Invite = "YourInvite", -- Example: "abc123"
+       Invite = "", -- Optional Discord invite
        RememberJoins = true
     },
-    KeySystem = false, -- Set to true if you want key system
+    KeySystem = false, -- Change to true if you want a key system
     KeySettings = {
        Title = "Key System",
        Subtitle = "Enter your key",
@@ -28,22 +28,22 @@ local Window = Rayfield:CreateWindow({
     }
 })
 
--- Example Tab 1
-local MainTab = Window:CreateTab("Home", 4483362458) -- Icon can be AssetID
+-- =========================
+-- HOME TAB
+-- =========================
+local HomeTab = Window:CreateTab("Home", 4483362458) -- Icon asset ID
+HomeTab:CreateSection("Welcome Section")
 
--- Example Section in Tab
-local Section1 = MainTab:CreateSection("Welcome Section")
-
--- Example Button
-MainTab:CreateButton({
+-- Button example
+HomeTab:CreateButton({
     Name = "Click Me",
     Callback = function()
         print("Button clicked!")
     end
 })
 
--- Example Toggle
-MainTab:CreateToggle({
+-- Toggle example
+HomeTab:CreateToggle({
     Name = "Example Toggle",
     CurrentValue = false,
     Flag = "ExampleToggle",
@@ -52,8 +52,8 @@ MainTab:CreateToggle({
     end
 })
 
--- Example Slider
-MainTab:CreateSlider({
+-- Slider example
+HomeTab:CreateSlider({
     Name = "Example Slider",
     Range = {0, 100},
     Increment = 1,
@@ -65,8 +65,8 @@ MainTab:CreateSlider({
     end
 })
 
--- Example Dropdown
-MainTab:CreateDropdown({
+-- Dropdown example
+HomeTab:CreateDropdown({
     Name = "Example Dropdown",
     Options = {"Option 1", "Option 2", "Option 3"},
     CurrentOption = "Option 1",
@@ -76,10 +76,13 @@ MainTab:CreateDropdown({
     end
 })
 
--- Another Tab
+-- =========================
+-- SCRIPTS TAB
+-- =========================
 local ScriptsTab = Window:CreateTab("Scripts", 6023426926)
-
 ScriptsTab:CreateSection("Script Loader")
+
+-- Input for raw Lua script URL
 ScriptsTab:CreateInput({
     Name = "Load Script URL",
     PlaceholderText = "Paste raw .lua URL here",
@@ -91,3 +94,33 @@ ScriptsTab:CreateInput({
     end
 })
 
+-- =========================
+-- SETTINGS TAB (Optional)
+-- =========================
+local SettingsTab = Window:CreateTab("Settings", 4483362458)
+SettingsTab:CreateSection("UI Settings")
+
+-- Example toggle for theme
+SettingsTab:CreateToggle({
+    Name = "Enable Dark Mode",
+    CurrentValue = true,
+    Flag = "DarkMode",
+    Callback = function(value)
+        print("Dark Mode:", value)
+        -- You can later connect this to your GUI theme
+    end
+})
+
+-- Example slider for GUI transparency
+SettingsTab:CreateSlider({
+    Name = "GUI Transparency",
+    Range = {0, 1},
+    Increment = 0.1,
+    Suffix = "",
+    CurrentValue = 0.5,
+    Flag = "GUITransparency",
+    Callback = function(value)
+        print("Transparency set to:", value)
+        -- Connect this to GUI transparency later
+    end
+})
