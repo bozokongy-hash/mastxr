@@ -84,7 +84,7 @@ DiscordCorner.Parent = DiscordButton
 -- Invalid key label (inside frame, neat)
 local InvalidLabel = Instance.new("TextLabel")
 InvalidLabel.Size = UDim2.new(0.9,0,0,25)
-InvalidLabel.Position = UDim2.new(0.05,0,0.9,0)  -- neatly inside bottom
+InvalidLabel.Position = UDim2.new(0.05,0,0.9,0)
 InvalidLabel.BackgroundTransparency = 1
 InvalidLabel.TextColor3 = Color3.fromRGB(255,50,50)
 InvalidLabel.Font = Enum.Font.GothamBold
@@ -129,6 +129,57 @@ local function makeDraggable(frame)
 end
 makeDraggable(KeyFrame)
 
+-- Setup Mods Buttons for Musical Chairs
+local function setupModsTab(modsFrame)
+    local buttons = {
+        {Name = "Auto Sit", Callback = function()
+            print("Auto Sit activated")
+            -- Add Auto Sit code here
+        end},
+        {Name = "Speed Boost", Callback = function()
+            print("Speed Boost activated")
+            -- Add Speed Boost code here
+        end},
+        {Name = "Chair ESP", Callback = function()
+            print("Chair ESP activated")
+            -- Add Chair ESP code here
+        end},
+        {Name = "Auto Win", Callback = function()
+            print("Auto Win activated")
+            -- Add Auto Win code here
+        end},
+    }
+
+    local startX, startY, spacingX, spacingY = 0.1, 0.1, 0.05, 0.05
+    local buttonWidth, buttonHeight = 0.35, 0.15
+
+    for i, btnInfo in ipairs(buttons) do
+        local btn = Instance.new("TextButton")
+        btn.Size = UDim2.new(buttonWidth,0,buttonHeight,0)
+        local col = (i-1) % 2
+        local row = math.floor((i-1)/2)
+        btn.Position = UDim2.new(startX + col*(buttonWidth + spacingX),0,startY + row*(buttonHeight + spacingY),0)
+        btn.Text = btnInfo.Name
+        btn.BackgroundColor3 = Color3.fromRGB(70,70,70)
+        btn.TextColor3 = Color3.fromRGB(255,255,255)
+        btn.Font = Enum.Font.Gotham
+        btn.TextSize = 18
+        btn.Parent = modsFrame
+        local corner = Instance.new("UICorner")
+        corner.CornerRadius = UDim.new(0,10)
+        corner.Parent = btn
+
+        btn.MouseEnter:Connect(function()
+            btn.BackgroundColor3 = Color3.fromRGB(90,90,90)
+        end)
+        btn.MouseLeave:Connect(function()
+            btn.BackgroundColor3 = Color3.fromRGB(70,70,70)
+        end)
+
+        btn.MouseButton1Click:Connect(btnInfo.Callback)
+    end
+end
+
 -- Main Menu with vertical sidebar tabs
 local function createMainMenu()
     local MainFrame = Instance.new("Frame")
@@ -152,7 +203,7 @@ local function createMainMenu()
     MenuTitle.TextSize = 22
     MenuTitle.Parent = MainFrame
 
-    -- Sidebar tabs container
+    -- Sidebar
     local Sidebar = Instance.new("Frame")
     Sidebar.Size = UDim2.new(0,120,1,0)
     Sidebar.Position = UDim2.new(0,0,0,0)
@@ -174,7 +225,6 @@ local function createMainMenu()
         corner.CornerRadius = UDim.new(0,12)
         corner.Parent = btn
 
-        -- Hover effect
         btn.MouseEnter:Connect(function()
             btn.BackgroundColor3 = Color3.fromRGB(70,70,70)
         end)
@@ -187,10 +237,10 @@ local function createMainMenu()
         return btn
     end
 
-    local ModsTab = createSidebarTab("Mods", 50)
-    local SettingsTab = createSidebarTab("Settings", 120)
+    local ModsTab = createSidebarTab("Mods",50)
+    local SettingsTab = createSidebarTab("Settings",120)
 
-    -- Content frames (to the right of sidebar)
+    -- Content Frame
     local ContentFrame = Instance.new("Frame")
     ContentFrame.Size = UDim2.new(1,-120,1,0)
     ContentFrame.Position = UDim2.new(0,120,0,0)
@@ -202,19 +252,6 @@ local function createMainMenu()
     ModsFrame.Position = UDim2.new(0,0,0,0)
     ModsFrame.BackgroundTransparency = 1
     ModsFrame.Parent = ContentFrame
-
-    local ExampleModButton = Instance.new("TextButton")
-    ExampleModButton.Size = UDim2.new(0.6,0,0,30)
-    ExampleModButton.Position = UDim2.new(0.2,0,0.1,0)
-    ExampleModButton.Text = "Example Mod"
-    ExampleModButton.BackgroundColor3 = Color3.fromRGB(70,70,70)
-    ExampleModButton.TextColor3 = Color3.fromRGB(255,255,255)
-    ExampleModButton.Font = Enum.Font.Gotham
-    ExampleModButton.TextSize = 18
-    ExampleModButton.Parent = ModsFrame
-    local modCorner = Instance.new("UICorner")
-    modCorner.CornerRadius = UDim.new(0,10)
-    modCorner.Parent = ExampleModButton
 
     local SettingsFrame = Instance.new("Frame")
     SettingsFrame.Size = UDim2.new(1,0,1,0)
@@ -250,8 +287,10 @@ local function createMainMenu()
         activateTab(SettingsTab, ModsTab, SettingsFrame, ModsFrame)
     end)
 
-    -- Default active tab
     activateTab(ModsTab, SettingsTab, ModsFrame, SettingsFrame)
+
+    -- Setup Mods buttons
+    setupModsTab(ModsFrame)
 end
 
 -- Key validation
