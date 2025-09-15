@@ -1,40 +1,29 @@
--- MASTXR Hub Custom GUI (Fluent-inspired style)
+-- MASTXR Hub - Musical Chairs (Custom GUI + Auto Sit + Speed + Anti-Kick)
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
 local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
+local UserInputService = game:GetService("UserInputService")
 
--- ========== Main ScreenGui ==========
+-- ================== GUI ==================
 local gui = Instance.new("ScreenGui")
-gui.Name = "MASTXRHubCustom"
+gui.Name = "MASTXRHubGui"
 gui.ResetOnSpawn = false
 gui.Parent = player:WaitForChild("PlayerGui")
 
--- ========== Main Frame ==========
 local frame = Instance.new("Frame")
 frame.Size = UDim2.new(0, 350, 0, 180)
 frame.Position = UDim2.new(0.5, -175, 0.1, 0)
 frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 frame.BorderSizePixel = 0
-frame.BackgroundTransparency = 0
 frame.Parent = gui
 frame.ClipsDescendants = true
 
 -- Rounded corners
 local uicorner = Instance.new("UICorner", frame)
-uicorner.CornerRadius = UDim.new(0, 12)
+uicorner.CornerRadius = UDim.new(0,12)
 
--- Shadow
-local shadow = Instance.new("ImageLabel", frame)
-shadow.Size = UDim2.new(1, 10, 1, 10)
-shadow.Position = UDim2.new(0, -5, 0, -5)
-shadow.BackgroundTransparency = 1
-shadow.Image = "rbxassetid://1316045217" -- subtle shadow
-shadow.ScaleType = Enum.ScaleType.Slice
-shadow.SliceCenter = Rect.new(10,10,118,118)
-shadow.ZIndex = 0
-
--- ========== Title ==========
+-- Title
 local title = Instance.new("TextLabel", frame)
 title.Size = UDim2.new(1,0,0,30)
 title.Position = UDim2.new(0,0,0,0)
@@ -44,7 +33,7 @@ title.Font = Enum.Font.GothamBold
 title.TextSize = 18
 title.TextColor3 = Color3.fromRGB(255,255,255)
 
--- ========== Close Button ==========
+-- Close Button
 local closeBtn = Instance.new("TextButton", frame)
 closeBtn.Size = UDim2.new(0,25,0,25)
 closeBtn.Position = UDim2.new(1,-30,0,3)
@@ -52,17 +41,14 @@ closeBtn.Text = "✕"
 closeBtn.Font = Enum.Font.GothamBold
 closeBtn.TextSize = 18
 closeBtn.TextColor3 = Color3.fromRGB(255,255,255)
-closeBtn.BackgroundTransparency = 0
 closeBtn.BackgroundColor3 = Color3.fromRGB(180,50,50)
-closeBtn.AutoButtonColor = true
 local cornerBtn = Instance.new("UICorner", closeBtn)
 cornerBtn.CornerRadius = UDim.new(0,5)
-
 closeBtn.MouseButton1Click:Connect(function()
     gui:Destroy()
 end)
 
--- ========== Toggle Function ==========
+-- ================== Toggle Function ==================
 local function CreateToggle(parent, name, default, callback)
     local btnFrame = Instance.new("Frame", parent)
     btnFrame.Size = UDim2.new(1,-40,0,40)
@@ -101,7 +87,7 @@ local function CreateToggle(parent, name, default, callback)
     end)
 end
 
--- ========== Slider Function ==========
+-- ================== Slider Function ==================
 local function CreateSlider(parent, name, min, max, default, callback)
     local sliderFrame = Instance.new("Frame", parent)
     sliderFrame.Size = UDim2.new(1,-40,0,30)
@@ -121,7 +107,7 @@ local function CreateSlider(parent, name, min, max, default, callback)
     label.BackgroundTransparency = 1
 
     local bar = Instance.new("Frame", sliderFrame)
-    bar.Size = UDim2.new(1, -10, 0.4, 0)
+    bar.Size = UDim2.new(1,-10,0.4,0)
     bar.Position = UDim2.new(0,5,0.55,0)
     bar.BackgroundColor3 = Color3.fromRGB(100,100,100)
     local barCorner = Instance.new("UICorner", bar)
@@ -155,20 +141,85 @@ local function CreateSlider(parent, name, min, max, default, callback)
     end)
 end
 
--- ========== Add Toggles and Sliders ==========
--- Auto Sit Toggle
+-- ================== Anti-Kick ==================
+do
+    local mt = getrawmetatable(game)
+    local oldNamecall = mt.__namecall
+    setreadonly(mt,false)
+    mt.__namecall = newcclosure(function(self,...)
+        local method = getnamecallmethod()
+        if method == "Kick" then return nil end
+        return oldNamecall(self,...)
+    end)
+    setreadonly(mt,true)
+end
+
+-- ================== Auto Sit Logic ==================
+local autoEnabled = false
+local autoLoop
+local function getTargetChair()
+    local spinner = workspace:FindFirstChild("SpinnerStuff")
+    if spinner and spinner:FindFirstChild("ChairSpots") then
+        for _, spot in pairs(spinner.ChairSpots:GetChildren()) do
+            if spot:FindFirstChild("ChairParts") and spot.ChairParts:FindFirstChild("Cushion") then
+                local cushion = spot.ChairParts.Cushion
+                if cushion and not cushion.Occupant then
+                    return cushion
+                end
+            end
+        end
+    end
+    return nil
+end
+
+local function smoothTeleport(targetPos)
+    local char = player.Character or player.CharacterAdded:Wait()
+    local root = char:WaitForChild("HumanoidRootPart")
+    local offset = Vector3.new(math.random()*0.5,0,math.random()*0.5)
+    root.CFrame = root.CFrame:Lerp(targetPos + Vector3.new(0,5,0) + offset,0.35)
+end
+
+-- ================== Speed Logic ==================
+local currentSpeed = 16
+local function applySpeed(value)
+    local char = player.Character
+    if char and char:FindFirstChild("Humanoid") then
+        local hum = char.Humanoid
+        task.spawn(function()
+            local step = (value - hum.WalkSpeed)/5
+            for i=1,5 do
+                hum.WalkSpeed = hum.WalkSpeed + step
+                task.wait(0.05)
+            end
+            hum.WalkSpeed = value
+        end)
+    end
+end
+
+-- ================== GUI Controls ==================
 CreateToggle(frame,"Auto Sit",false,function(state)
-    print("Auto Sit:",state)
-    -- connect your Auto Sit function here
+    autoEnabled = state
+    if state then
+        autoLoop = task.spawn(function()
+            while autoEnabled do
+                local target = getTargetChair()
+                if target then
+                    smoothTeleport(target.Position)
+                end
+                task.wait(0.7 + math.random()*0.3)
+            end
+        end)
+    else
+        if autoLoop then task.cancel(autoLoop) end
+    end
 end)
 
--- Speed Slider
 CreateSlider(frame,"Speed Boost",16,100,16,function(value)
-    print("Speed:",value)
-    -- connect your speed ramp function here
+    currentSpeed = value
+    applySpeed(value)
 end)
 
--- ========== Notification Example ==========
+-- ================== Notification ==================
 local function notify(msg)
     local notif = Instance.new("TextLabel", frame)
     notif.Size = UDim2.new(1,-40,0,25)
@@ -182,4 +233,4 @@ local function notify(msg)
     task.delay(3,function() notif:Destroy() end)
 end
 
-notify("Custom MASTXR Hub Loaded!")
+notify("MASTXR Hub Loaded Successfully!")
