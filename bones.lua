@@ -31,7 +31,7 @@ local function ComingSoon(title)
     end
 end
 
--- Utility to find all seats/chairs anywhere in workspace
+-- Utility to find all seats/chairs
 local function getAllChairs()
     local chairs = {}
     for _, obj in ipairs(workspace:GetDescendants()) do
@@ -43,85 +43,51 @@ local function getAllChairs()
 end
 
 -- ===== Musical Chairs Tab =====
-
--- Auto Sit (teleports player to nearest free seat)
-Tabs.MusicalChairs:AddButton({
-    Title = "Auto Sit",
-    Description = "Teleport to the nearest empty seat when music stops",
-    Callback = function()
-        local player = game.Players.LocalPlayer
-        local char = player.Character or player.CharacterAdded:Wait()
-        local hrp = char:WaitForChild("HumanoidRootPart", 5)
-        if not hrp then
-            Fluent:Notify({
-                Title = "MASTXR Hub",
-                Content = "Couldn't find HumanoidRootPart!",
-                Duration = 5
-            })
-            return
-        end
-
-        local chairs = getAllChairs()
-        local nearest, minDist = nil, math.huge
-        for _, seat in ipairs(chairs) do
-            if seat.Occupant == nil then
-                local d = (hrp.Position - seat.Position).Magnitude
-                if d < minDist then
-                    nearest, minDist = seat, d
-                end
-            end
-        end
-
-        if nearest then
-            -- Move you right over it
-            hrp.CFrame = nearest.CFrame + Vector3.new(0, 2, 0)
-            Fluent:Notify({
-                Title = "MASTXR Hub",
-                Content = "Teleported to nearest empty seat!",
-                Duration = 5
-            })
-        else
-            Fluent:Notify({
-                Title = "MASTXR Hub",
-                Content = "No empty seats found!",
-                Duration = 5
-            })
-        end
-    end
-})
-
--- ESP Chairs (highlight every seat)
-Tabs.MusicalChairs:AddButton({
-    Title = "ESP Chairs",
-    Description = "Highlight all seats in view",
-    Callback = function()
-        local chairs = getAllChairs()
-        for _, seat in ipairs(chairs) do
-            -- Avoid duplicating highlight
-            if not seat:FindFirstChild("ChairHighlight_MASTXR") then
-                -- Some seats are not BasePart directly; check parent
-                local partForHighlight = seat
-                if not seat:IsA("BasePart") then
-                    -- try find a part inside seat
-                    partForHighlight = seat:FindFirstChildWhichIsA("BasePart") or seat
-                end
-                local hl = Instance.new("Highlight")
-                hl.Name = "ChairHighlight_MASTXR"
-                hl.FillColor = Color3.fromRGB(0, 255, 0)
-                hl.OutlineColor = Color3.fromRGB(255, 255, 255)
-                hl.Parent = partForHighlight
-            end
-        end
-        Fluent:Notify({
-            Title = "MASTXR Hub",
-            Content = "ESP applied to all seats!",
-            Duration = 6
-        })
-    end
-})
-
--- Speed Boost (slider)
 local player = game.Players.LocalPlayer
+local autoSitEnabled = false
+local autoSitLoop
+
+-- Auto Sit (Toggle)
+Tabs.MusicalChairs:AddToggle("AutoSitToggle", {
+    Title = "Auto Sit",
+    Default = false,
+    Callback = function(state)
+        autoSitEnabled = state
+        if state then
+            Fluent:Notify({ Title = "MASTXR Hub", Content = "Auto Sit ON", Duration = 4 })
+            autoSitLoop = task.spawn(function()
+                while autoSitEnabled do
+                    local char = player.Character or player.CharacterAdded:Wait()
+                    local hrp = char:WaitForChild("HumanoidRootPart", 5)
+                    if hrp then
+                        local chairs = getAllChairs()
+                        local nearest, minDist = nil, math.huge
+                        for _, seat in ipairs(chairs) do
+                            if seat.Occupant == nil then
+                                local d = (hrp.Position - seat.Position).Magnitude
+                                if d < minDist then
+                                    nearest, minDist = seat, d
+                                end
+                            end
+                        end
+                        if nearest then
+                            -- Smooth move instead of instant teleport (anti-cheat friendly)
+                            hrp.CFrame = hrp.CFrame:Lerp(nearest.CFrame + Vector3.new(0,2,0), 0.25)
+                        end
+                    end
+                    task.wait(0.75) -- delay between checks
+                end
+            end)
+        else
+            Fluent:Notify({ Title = "MASTXR Hub", Content = "Auto Sit OFF", Duration = 4 })
+            if autoSitLoop then
+                task.cancel(autoSitLoop)
+            end
+        end
+    end
+})
+
+-- Speed Boost (Slider + Toggle Reset)
 Tabs.MusicalChairs:AddSlider("SpeedSlider", {
     Title = "Speed Boost",
     Description = "Adjust WalkSpeed",
@@ -135,12 +101,49 @@ Tabs.MusicalChairs:AddSlider("SpeedSlider", {
         end
     end
 })
+Tabs.MusicalChairs:AddToggle("SpeedResetToggle", {
+    Title = "Reset Speed (16)",
+    Default = false,
+    Callback = function(state)
+        if state then
+            if player.Character and player.Character:FindFirstChild("Humanoid") then
+                player.Character.Humanoid.WalkSpeed = 16
+            end
+            Fluent:Notify({ Title = "MASTXR Hub", Content = "Speed reset to default!", Duration = 4 })
+        end
+    end
+})
 
--- Placeholder future button
+-- Anti-Kick (replacing ESP)
+Tabs.MusicalChairs:AddToggle("AntiKickToggle", {
+    Title = "Anti-Kick",
+    Default = false,
+    Callback = function(state)
+        if state then
+            -- Hook Kick methods
+            local mt = getrawmetatable(game)
+            local oldNamecall = mt.__namecall
+            setreadonly(mt, false)
+            mt.__namecall = newcclosure(function(self, ...)
+                local method = getnamecallmethod()
+                if method == "Kick" then
+                    return nil
+                end
+                return oldNamecall(self, ...)
+            end)
+            setreadonly(mt, true)
+            Fluent:Notify({ Title = "MASTXR Hub", Content = "Anti-Kick enabled", Duration = 5 })
+        else
+            Fluent:Notify({ Title = "MASTXR Hub", Content = "Anti-Kick toggle off (rejoin to reset hooks)", Duration = 5 })
+        end
+    end
+})
+
+-- Placeholder
 Tabs.MusicalChairs:AddButton({
-    Title = "Feature 4",
+    Title = "Extra Feature",
     Description = "Coming Soon",
-    Callback = ComingSoon("Musical Chairs Feature 4")
+    Callback = ComingSoon("Musical Chairs Extra Feature")
 })
 
 -- ===== Settings Tab =====
