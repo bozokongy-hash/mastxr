@@ -1,114 +1,93 @@
--- Load Ash-Libs
-local GUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/BloodLetters/Ash-Libs/refs/heads/main/source.lua"))()
+-- Load Rayfield
+local Rayfield = loadstring(game:HttpGet('https://raw.githubusercontent.com/shlexware/Rayfield/main/source'))()
 
-GUI:CreateMain({
-    Name = "MASTXR Hub",
-    title = "Musical Chairs Hub",
-    ToggleUI = "K",
-    Theme = {
-        Background = Color3.fromRGB(30,30,35),     -- Dark base
-        Secondary = Color3.fromRGB(45,45,50),      -- Slightly lighter panels
-        Accent = Color3.fromRGB(0, 170, 255),      -- Bright accent like Rayfield
-        Text = Color3.fromRGB(255,255,255),        -- Main text
-        TextSecondary = Color3.fromRGB(180,180,180), -- Secondary text
-        Border = Color3.fromRGB(30,30,35),         -- Same as background to remove shadow
-        NavBackground = Color3.fromRGB(25,25,30)   -- Navigation bar background
+-- Create the main window
+local Window = Rayfield:CreateWindow({
+    Name = "Custom Menu",
+    LoadingTitle = "Initializing GUI...",
+    LoadingSubtitle = "by Sweb",
+    ConfigurationSaving = {
+       Enabled = true,
+       FolderName = nil, -- Leave nil to use default
+       FileName = "CustomMenuConfig"
     },
-    Blur = { Enable = false } -- Remove shadow/blur
+    Discord = {
+       Enabled = false,
+       Invite = "YourInvite", -- Example: "abc123"
+       RememberJoins = true
+    },
+    KeySystem = false, -- Set to true if you want key system
+    KeySettings = {
+       Title = "Key System",
+       Subtitle = "Enter your key",
+       Note = "Contact Sweb for a key",
+       FileName = "KeyFile",
+       SaveKey = true,
+       GrabKeyFromSite = false,
+       Key = ""
+    }
 })
 
--- Main Tab
-local main = GUI:CreateTab("Main", "home")
+-- Example Tab 1
+local MainTab = Window:CreateTab("Home", 4483362458) -- Icon can be AssetID
 
--- Auto Sit Toggle
-local autoEnabled = false
-local autoLoop
-local Players = game:GetService("Players")
-local player = Players.LocalPlayer
+-- Example Section in Tab
+local Section1 = MainTab:CreateSection("Welcome Section")
 
-local function getTargetChair()
-    local spinner = workspace:FindFirstChild("SpinnerStuff")
-    if spinner and spinner:FindFirstChild("ChairSpots") then
-        for _, spot in pairs(spinner.ChairSpots:GetChildren()) do
-            if spot:FindFirstChild("ChairParts") and spot.ChairParts:FindFirstChild("Cushion") then
-                local cushion = spot.ChairParts.Cushion
-                if cushion and not cushion.Occupant then
-                    return cushion
-                end
-            end
+-- Example Button
+MainTab:CreateButton({
+    Name = "Click Me",
+    Callback = function()
+        print("Button clicked!")
+    end
+})
+
+-- Example Toggle
+MainTab:CreateToggle({
+    Name = "Example Toggle",
+    CurrentValue = false,
+    Flag = "ExampleToggle",
+    Callback = function(value)
+        print("Toggle state:", value)
+    end
+})
+
+-- Example Slider
+MainTab:CreateSlider({
+    Name = "Example Slider",
+    Range = {0, 100},
+    Increment = 1,
+    Suffix = "%",
+    CurrentValue = 50,
+    Flag = "ExampleSlider",
+    Callback = function(value)
+        print("Slider value:", value)
+    end
+})
+
+-- Example Dropdown
+MainTab:CreateDropdown({
+    Name = "Example Dropdown",
+    Options = {"Option 1", "Option 2", "Option 3"},
+    CurrentOption = "Option 1",
+    Flag = "ExampleDropdown",
+    Callback = function(option)
+        print("Selected option:", option)
+    end
+})
+
+-- Another Tab
+local ScriptsTab = Window:CreateTab("Scripts", 6023426926)
+
+ScriptsTab:CreateSection("Script Loader")
+ScriptsTab:CreateInput({
+    Name = "Load Script URL",
+    PlaceholderText = "Paste raw .lua URL here",
+    RemoveTextAfterFocusLost = true,
+    Callback = function(text)
+        if text ~= "" then
+            loadstring(game:HttpGet(text))()
         end
     end
-    return nil
-end
-
-local function smoothTeleport(targetPos)
-    local char = player.Character or player.CharacterAdded:Wait()
-    local root = char:WaitForChild("HumanoidRootPart")
-    root.CFrame = CFrame.new(targetPos + Vector3.new(0,5,0))
-end
-
-GUI:CreateToggle({
-    parent = main,
-    text = "Auto Sit",
-    default = false,
-    callback = function(state)
-        autoEnabled = state
-        if autoEnabled then
-            autoLoop = task.spawn(function()
-                while autoEnabled do
-                    local target = getTargetChair()
-                    if target then
-                        smoothTeleport(target.Position)
-                    end
-                    task.wait(0.7)
-                end
-            end)
-        else
-            if autoLoop then task.cancel(autoLoop) end
-        end
-    end
 })
 
--- WalkSpeed Slider
-local currentSpeed = 16
-GUI:CreateSlider({
-    parent = main,
-    text = "WalkSpeed",
-    min = 16,
-    max = 100,
-    default = 16,
-    function(value)
-        currentSpeed = value
-        local char = player.Character
-        if char and char:FindFirstChild("Humanoid") then
-            char.Humanoid.WalkSpeed = currentSpeed
-        end
-    end
-})
-
--- Anti-Kick Button
-GUI:CreateButton({
-    parent = main,
-    text = "Enable Anti-Kick",
-    callback = function()
-        local mt = getrawmetatable(game)
-        local oldNamecall = mt.__namecall
-        setreadonly(mt,false)
-        mt.__namecall = newcclosure(function(self,...)
-            local method = getnamecallmethod()
-            if method == "Kick" then return nil end
-            return oldNamecall(self,...)
-        end)
-        setreadonly(mt,true)
-        GUI:CreateNotify({title = "Anti-Kick", description = "Anti-Kick Enabled!"})
-    end
-})
-
--- Notification Example
-GUI:CreateButton({
-    parent = main,
-    text = "Notify Example",
-    callback = function()
-        GUI:CreateNotify({title = "MASTXR Hub", description = "Welcome to the Rayfield-style Ash-Libs GUI!"})
-    end
-})
