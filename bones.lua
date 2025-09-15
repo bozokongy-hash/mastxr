@@ -66,35 +66,22 @@ DiscordButton.BackgroundColor3 = Color3.fromRGB(100,50,200)
 DiscordButton.TextColor3 = Color3.fromRGB(255,255,255)
 DiscordButton.Parent = KeyFrame
 
+-- === Discord button copy to clipboard & TextBox feedback ===
 DiscordButton.MouseButton1Click:Connect(function()
-    -- Copy link to clipboard
+    -- Copy link
     pcall(function()
         setclipboard(discordLink)
     end)
 
-    -- Notification
-    local Notification = Instance.new("TextLabel")
-    Notification.Size = UDim2.new(0,200,0,50)
-    Notification.Position = UDim2.new(0.5,-100,0.2,0)
-    Notification.BackgroundColor3 = Color3.fromRGB(50,50,50)
-    Notification.TextColor3 = Color3.fromRGB(255,255,255)
-    Notification.Text = "Discord link copied!"
-    Notification.Font = Enum.Font.SourceSansBold
-    Notification.TextSize = 18
-    Notification.Parent = ScreenGui
-    local UICorner = Instance.new("UICorner")
-    UICorner.CornerRadius = UDim.new(0,10)
-    UICorner.Parent = Notification
+    -- Update TextBox
+    KeyBox.Text = "Link copied to clipboard!"
+    KeyBox.TextColor3 = Color3.fromRGB(0,255,0)
 
-    -- Fade out and destroy after 2 seconds
-    spawn(function()
-        wait(2)
-        for i=1,20 do
-            Notification.TextTransparency = i*0.05
-            Notification.BackgroundTransparency = i*0.05
-            wait(0.05)
-        end
-        Notification:Destroy()
+    -- Reset color when user types
+    local connection
+    connection = KeyBox:GetPropertyChangedSignal("Text"):Connect(function()
+        KeyBox.TextColor3 = Color3.fromRGB(255,255,255)
+        connection:Disconnect()
     end)
 end)
 
@@ -214,8 +201,3 @@ SubmitButton.MouseButton1Click:Connect(function()
     local key = KeyBox.Text
     if validKeys[key] then
         KeyFrame:Destroy()
-        createMainMenu()
-    else
-        Title.Text = "Invalid Key! Copy Discord link above."
-    end
-end)
