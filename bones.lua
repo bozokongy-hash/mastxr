@@ -6,14 +6,15 @@ GUI:CreateMain({
     title = "Musical Chairs Hub",
     ToggleUI = "K",
     Theme = {
-        Background = Color3.fromRGB(25,25,35),
-        Secondary = Color3.fromRGB(35,35,45),
-        Accent = Color3.fromRGB(255,0,0),
-        Text = Color3.fromRGB(255,255,255),
-        TextSecondary = Color3.fromRGB(180,180,180),
-        Border = Color3.fromRGB(50,50,60),
-        NavBackground = Color3.fromRGB(20,20,30)
-    }
+        Background = Color3.fromRGB(30,30,35),     -- Dark base
+        Secondary = Color3.fromRGB(45,45,50),      -- Slightly lighter panels
+        Accent = Color3.fromRGB(0, 170, 255),      -- Bright accent like Rayfield
+        Text = Color3.fromRGB(255,255,255),        -- Main text
+        TextSecondary = Color3.fromRGB(180,180,180), -- Secondary text
+        Border = Color3.fromRGB(30,30,35),         -- Same as background to remove shadow
+        NavBackground = Color3.fromRGB(25,25,30)   -- Navigation bar background
+    },
+    Blur = { Enable = false } -- Remove shadow/blur
 })
 
 -- Main Tab
@@ -68,7 +69,7 @@ GUI:CreateToggle({
     end
 })
 
--- Speed Slider
+-- WalkSpeed Slider
 local currentSpeed = 16
 GUI:CreateSlider({
     parent = main,
@@ -108,6 +109,6 @@ GUI:CreateButton({
     parent = main,
     text = "Notify Example",
     callback = function()
-        GUI:CreateNotify({title = "MASTXR Hub", description = "Welcome to the Ash-Libs GUI!"})
+        GUI:CreateNotify({title = "MASTXR Hub", description = "Welcome to the Rayfield-style Ash-Libs GUI!"})
     end
 })
