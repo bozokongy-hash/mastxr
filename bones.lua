@@ -129,7 +129,7 @@ local function makeDraggable(frame)
 end
 makeDraggable(KeyFrame)
 
--- Main Menu
+-- Main Menu with vertical sidebar tabs
 local function createMainMenu()
     local MainFrame = Instance.new("Frame")
     MainFrame.Size = UDim2.new(0,420,0,320)
@@ -152,23 +152,24 @@ local function createMainMenu()
     MenuTitle.TextSize = 22
     MenuTitle.Parent = MainFrame
 
-    -- Tabs container
-    local TabContainer = Instance.new("Frame")
-    TabContainer.Size = UDim2.new(1,0,0,35)
-    TabContainer.Position = UDim2.new(0,0,0.08,0)
-    TabContainer.BackgroundTransparency = 1
-    TabContainer.Parent = MainFrame
+    -- Sidebar tabs container
+    local Sidebar = Instance.new("Frame")
+    Sidebar.Size = UDim2.new(0,120,1,0)
+    Sidebar.Position = UDim2.new(0,0,0,0)
+    Sidebar.BackgroundTransparency = 1
+    Sidebar.Parent = MainFrame
 
-    local function createTab(name, position)
+    local function createSidebarTab(name, yPos)
         local btn = Instance.new("TextButton")
-        btn.Size = UDim2.new(0,150,1,0)
-        btn.Position = UDim2.new(0,position,0,0)
+        btn.Size = UDim2.new(1,-20,0,50)
+        btn.Position = UDim2.new(0,10,0,yPos)
         btn.Text = name
         btn.BackgroundColor3 = Color3.fromRGB(50,50,50)
         btn.TextColor3 = Color3.fromRGB(200,200,200)
         btn.Font = Enum.Font.Gotham
         btn.TextSize = 18
-        btn.Parent = TabContainer
+        btn.Parent = Sidebar
+
         local corner = Instance.new("UICorner")
         corner.CornerRadius = UDim.new(0,12)
         corner.Parent = btn
@@ -182,18 +183,25 @@ local function createMainMenu()
                 btn.BackgroundColor3 = Color3.fromRGB(50,50,50)
             end
         end)
+
         return btn
     end
 
-    local ModsTab = createTab("Mods",20)
-    local SettingsTab = createTab("Settings",180)
+    local ModsTab = createSidebarTab("Mods", 50)
+    local SettingsTab = createSidebarTab("Settings", 120)
 
-    -- Frames
+    -- Content frames (to the right of sidebar)
+    local ContentFrame = Instance.new("Frame")
+    ContentFrame.Size = UDim2.new(1,-120,1,0)
+    ContentFrame.Position = UDim2.new(0,120,0,0)
+    ContentFrame.BackgroundTransparency = 1
+    ContentFrame.Parent = MainFrame
+
     local ModsFrame = Instance.new("Frame")
-    ModsFrame.Size = UDim2.new(1,0,0.8,0)
-    ModsFrame.Position = UDim2.new(0,0,0.2,0)
+    ModsFrame.Size = UDim2.new(1,0,1,0)
+    ModsFrame.Position = UDim2.new(0,0,0,0)
     ModsFrame.BackgroundTransparency = 1
-    ModsFrame.Parent = MainFrame
+    ModsFrame.Parent = ContentFrame
 
     local ExampleModButton = Instance.new("TextButton")
     ExampleModButton.Size = UDim2.new(0.6,0,0,30)
@@ -209,11 +217,11 @@ local function createMainMenu()
     modCorner.Parent = ExampleModButton
 
     local SettingsFrame = Instance.new("Frame")
-    SettingsFrame.Size = UDim2.new(1,0,0.8,0)
-    SettingsFrame.Position = UDim2.new(0,0,0.2,0)
+    SettingsFrame.Size = UDim2.new(1,0,1,0)
+    SettingsFrame.Position = UDim2.new(0,0,0,0)
     SettingsFrame.BackgroundTransparency = 1
     SettingsFrame.Visible = false
-    SettingsFrame.Parent = MainFrame
+    SettingsFrame.Parent = ContentFrame
 
     local ExampleSetting = Instance.new("TextLabel")
     ExampleSetting.Size = UDim2.new(0.8,0,0,30)
