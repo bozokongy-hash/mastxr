@@ -34,6 +34,7 @@ UICornerKey.Parent = KeyFrame
 
 local Title = Instance.new("TextLabel")
 Title.Size = UDim2.new(1,0,0,40)
+Title.Position = UDim2.new(0,0,0,5)
 Title.BackgroundTransparency = 1
 Title.Text = "IEEF Hub - Key"
 Title.TextColor3 = Color3.fromRGB(255,255,255)
@@ -80,15 +81,17 @@ local DiscordCorner = Instance.new("UICorner")
 DiscordCorner.CornerRadius = UDim.new(0,8)
 DiscordCorner.Parent = DiscordButton
 
--- Invalid key label (hidden initially)
+-- Invalid key label (inside frame, neat)
 local InvalidLabel = Instance.new("TextLabel")
-InvalidLabel.Size = UDim2.new(1,0,0,25)
-InvalidLabel.Position = UDim2.new(0,0,0.92,0)
+InvalidLabel.Size = UDim2.new(0.9,0,0,25)
+InvalidLabel.Position = UDim2.new(0.05,0,0.9,0)  -- neatly inside bottom
 InvalidLabel.BackgroundTransparency = 1
 InvalidLabel.TextColor3 = Color3.fromRGB(255,50,50)
 InvalidLabel.Font = Enum.Font.GothamBold
 InvalidLabel.TextSize = 16
 InvalidLabel.Text = ""
+InvalidLabel.TextWrapped = true
+InvalidLabel.TextScaled = true
 InvalidLabel.Parent = KeyFrame
 
 -- Copy Discord link
@@ -250,7 +253,7 @@ SubmitButton.MouseButton1Click:Connect(function()
         KeyFrame:Destroy()
         createMainMenu()
     else
-        InvalidLabel.Text = "Invalid Key! Copy Discord link below."
+        InvalidLabel.Text = "Invalid Key! Copy Discord link above."
         InvalidLabel.TextColor3 = Color3.fromRGB(255,50,50)
     end
 end)
