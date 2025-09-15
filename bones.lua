@@ -1,306 +1,245 @@
--- Services
+-- Roblox Mod Menu GUI (Working Version)
+-- Place this as a LocalScript in StarterPlayerScripts or StarterGui
+
 local Players = game:GetService("Players")
-local Player = Players.LocalPlayer
-local CoreGui = game:GetService("CoreGui")
-local UserInputService = game:GetService("UserInputService")
+local UIS = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
 
--- Remove old GUI
-for _, gui in pairs(CoreGui:GetChildren()) do
-    if gui.Name == "IEEFHub" then gui:Destroy() end
-end
-for _, gui in pairs(Player:WaitForChild("PlayerGui"):GetChildren()) do
-    if gui.Name == "IEEFHub" then gui:Destroy() end
-end
+local player = Players.LocalPlayer
+local guiParent = player:WaitForChild("PlayerGui")
 
--- Keys and Discord
-local validKeys = {["IEEF-1234"]=true,["IEEF-5678"]=true,["IEEF-9012"]=true}
-local discordLink = "https://discord.gg/Q9caeDr2M8"
+-- Theme
+local COLORS = {
+    background = Color3.fromRGB(15, 15, 15),
+    panel = Color3.fromRGB(20, 20, 20),
+    border = Color3.fromRGB(46, 46, 46),
+    muted = Color3.fromRGB(30, 30, 30),
+    text = Color3.fromRGB(245, 245, 245),
+    subtle = Color3.fromRGB(160, 160, 160),
+    primary = Color3.fromRGB(22, 163, 74),
+    accent = Color3.fromRGB(16, 112, 56),
+    shadow = Color3.fromRGB(0, 0, 0),
+}
 
--- Create ScreenGui
-local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "IEEFHub"
-ScreenGui.Parent = CoreGui
-
--- Key Frame
-local KeyFrame = Instance.new("Frame")
-KeyFrame.Size = UDim2.new(0, 300, 0, 230)
-KeyFrame.Position = UDim2.new(0.5, -150, 0.5, -115)
-KeyFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-KeyFrame.ClipsDescendants = true
-KeyFrame.Parent = ScreenGui
-local UICornerKey = Instance.new("UICorner")
-UICornerKey.CornerRadius = UDim.new(0,15)
-UICornerKey.Parent = KeyFrame
-
-local Title = Instance.new("TextLabel")
-Title.Size = UDim2.new(1,0,0,40)
-Title.Position = UDim2.new(0,0,0,5)
-Title.BackgroundTransparency = 1
-Title.Text = "IEEF Hub - Key"
-Title.TextColor3 = Color3.fromRGB(255,255,255)
-Title.Font = Enum.Font.GothamBold
-Title.TextSize = 20
-Title.Parent = KeyFrame
-
-local KeyBox = Instance.new("TextBox")
-KeyBox.Size = UDim2.new(0.8,0,0,30)
-KeyBox.Position = UDim2.new(0.1,0,0.35,0)
-KeyBox.PlaceholderText = "Enter Discord Key"
-KeyBox.BackgroundColor3 = Color3.fromRGB(50,50,50)
-KeyBox.TextColor3 = Color3.fromRGB(255,255,255)
-KeyBox.ClearTextOnFocus = true
-KeyBox.TextScaled = true
-KeyBox.Parent = KeyFrame
-local KeyBoxCorner = Instance.new("UICorner")
-KeyBoxCorner.CornerRadius = UDim.new(0,8)
-KeyBoxCorner.Parent = KeyBox
-
-local SubmitButton = Instance.new("TextButton")
-SubmitButton.Size = UDim2.new(0.5,0,0,30)
-SubmitButton.Position = UDim2.new(0.25,0,0.55,0)
-SubmitButton.Text = "Submit"
-SubmitButton.BackgroundColor3 = Color3.fromRGB(70,70,70)
-SubmitButton.TextColor3 = Color3.fromRGB(255,255,255)
-SubmitButton.Font = Enum.Font.Gotham
-SubmitButton.TextSize = 18
-SubmitButton.Parent = KeyFrame
-local SubmitCorner = Instance.new("UICorner")
-SubmitCorner.CornerRadius = UDim.new(0,8)
-SubmitCorner.Parent = SubmitButton
-
-local DiscordButton = Instance.new("TextButton")
-DiscordButton.Size = UDim2.new(0.5,0,0,30)
-DiscordButton.Position = UDim2.new(0.25,0,0.75,0)
-DiscordButton.Text = "Copy Discord Link"
-DiscordButton.BackgroundColor3 = Color3.fromRGB(100,50,200)
-DiscordButton.TextColor3 = Color3.fromRGB(255,255,255)
-DiscordButton.Font = Enum.Font.Gotham
-DiscordButton.TextSize = 18
-DiscordButton.Parent = KeyFrame
-local DiscordCorner = Instance.new("UICorner")
-DiscordCorner.CornerRadius = UDim.new(0,8)
-DiscordCorner.Parent = DiscordButton
-
--- Invalid key label (inside frame, neat)
-local InvalidLabel = Instance.new("TextLabel")
-InvalidLabel.Size = UDim2.new(0.9,0,0,25)
-InvalidLabel.Position = UDim2.new(0.05,0,0.9,0)
-InvalidLabel.BackgroundTransparency = 1
-InvalidLabel.TextColor3 = Color3.fromRGB(255,50,50)
-InvalidLabel.Font = Enum.Font.GothamBold
-InvalidLabel.TextSize = 16
-InvalidLabel.Text = ""
-InvalidLabel.TextWrapped = true
-InvalidLabel.TextScaled = true
-InvalidLabel.Parent = KeyFrame
-
--- Copy Discord link
-DiscordButton.MouseButton1Click:Connect(function()
-    pcall(setclipboard, discordLink)
-    InvalidLabel.Text = "Discord link copied!"
-    InvalidLabel.TextColor3 = Color3.fromRGB(0,255,0)
-    wait(2)
-    InvalidLabel.Text = ""
-end)
-
--- Draggable function
-local function makeDraggable(frame)
-    local dragging, dragInput, mousePos, framePos = false,nil,nil,nil
-    local function update(input)
-        local delta = input.Position - mousePos
-        frame.Position = UDim2.new(framePos.X.Scale, framePos.X.Offset+delta.X, framePos.Y.Scale, framePos.Y.Offset+delta.Y)
+-- Utility Functions
+local function New(className, props, children)
+    local inst = Instance.new(className)
+    if props then
+        for k, v in pairs(props) do
+            inst[k] = v
+        end
     end
-    frame.InputBegan:Connect(function(input)
-        if input.UserInputType==Enum.UserInputType.MouseButton1 then
-            dragging=true
-            mousePos=input.Position
-            framePos=frame.Position
+    if children then
+        for _, child in ipairs(children) do
+            child.Parent = inst
+        end
+    end
+    return inst
+end
+
+local function setPadding(container, pad)
+    New("UIPadding", {
+        Parent = container,
+        PaddingTop = UDim.new(0, pad),
+        PaddingBottom = UDim.new(0, pad),
+        PaddingLeft = UDim.new(0, pad),
+        PaddingRight = UDim.new(0, pad),
+    })
+end
+
+local function makeToast(root, text)
+    local lbl = New("TextLabel", {
+        BackgroundTransparency = 0.15,
+        BackgroundColor3 = COLORS.muted,
+        TextColor3 = COLORS.text,
+        Text = text,
+        Font = Enum.Font.GothamSemibold,
+        TextSize = 14,
+        AutomaticSize = Enum.AutomaticSize.XY,
+        AnchorPoint = Vector2.new(0.5, 1),
+        Position = UDim2.fromScale(0.5, 1),
+        ZIndex = 50,
+    }, {
+        New("UIPadding", { PaddingTop = UDim.new(0, 8), PaddingBottom = UDim.new(0, 8), PaddingLeft = UDim.new(0, 12), PaddingRight = UDim.new(0, 12) }),
+        New("UICorner", { CornerRadius = UDim.new(0, 8) }),
+    })
+    lbl.Parent = root
+    lbl.BackgroundTransparency = 1
+    lbl.TextTransparency = 1
+    TweenService:Create(lbl, TweenInfo.new(0.18, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), { BackgroundTransparency = 0.15, TextTransparency = 0 }):Play()
+    task.delay(1.5, function()
+        TweenService:Create(lbl, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.In), { BackgroundTransparency = 1, TextTransparency = 1 }):Play()
+        task.delay(0.26, function() lbl:Destroy() end)
+    end)
+end
+
+-- State
+local State = {
+    aimbot = { enabled = false, fov = 60, smooth = 50 },
+    visuals = { esp = true, boxes = true, chams = false },
+    movement = { fly = false, speed = 16, jump = 50, noclip = false },
+    misc = { bhop = false, god = false, autoCollect = false },
+}
+
+-- Root GUI
+local screen = New("ScreenGui", {
+    Name = "RobloxModMenuGUI",
+    IgnoreGuiInset = true,
+    ResetOnSpawn = false,
+    ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
+    Parent = guiParent,
+})
+
+-- Main window
+local window = New("Frame", {
+    Parent = screen,
+    BackgroundColor3 = COLORS.panel,
+    BorderSizePixel = 0,
+    Position = UDim2.fromOffset(420, 180),
+    Size = UDim2.fromOffset(720, 420),
+})
+New("UICorner", { Parent = window, CornerRadius = UDim.new(0, 12) })
+New("UIStroke", { Parent = window, Thickness = 1, Color = COLORS.border })
+
+-- Header (Draggable)
+local header = New("Frame", {
+    Parent = window,
+    BackgroundColor3 = Color3.fromRGB(28, 28, 28),
+    BorderSizePixel = 0,
+    Size = UDim2.new(1, 0, 0, 56),
+})
+New("UICorner", { Parent = header, CornerRadius = UDim.new(0, 12) })
+New("UIStroke", { Parent = header, Thickness = 1, Color = COLORS.border })
+
+local headerTitle = New("TextLabel", {
+    Parent = header,
+    Text = "MOD MENU",
+    Font = Enum.Font.GothamBlack,
+    TextSize = 18,
+    TextColor3 = COLORS.text,
+    BackgroundTransparency = 1,
+    Position = UDim2.fromOffset(16, 8),
+    Size = UDim2.fromOffset(200, 20),
+    TextXAlignment = Enum.TextXAlignment.Left,
+})
+
+-- Drag logic
+do
+    local dragging = false
+    local dragStart, startPos
+    header.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            dragging = true
+            dragStart = input.Position
+            startPos = window.Position
             input.Changed:Connect(function()
-                if input.UserInputState==Enum.UserInputState.End then dragging=false end
+                if input.UserInputState == Enum.UserInputState.End then
+                    dragging = false
+                end
             end)
         end
     end)
-    frame.InputChanged:Connect(function(input)
-        if input.UserInputType==Enum.UserInputType.MouseMovement then dragInput=input end
-    end)
-    UserInputService.InputChanged:Connect(function(input)
-        if input==dragInput and dragging then update(input) end
+    UIS.InputChanged:Connect(function(input)
+        if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+            local delta = input.Position - dragStart
+            window.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+        end
     end)
 end
-makeDraggable(KeyFrame)
 
--- Setup Mods Buttons for Musical Chairs
-local function setupModsTab(modsFrame)
-    local buttons = {
-        {Name = "Auto Sit", Callback = function()
-            print("Auto Sit activated")
-            -- Add Auto Sit code here
-        end},
-        {Name = "Speed Boost", Callback = function()
-            print("Speed Boost activated")
-            -- Add Speed Boost code here
-        end},
-        {Name = "Chair ESP", Callback = function()
-            print("Chair ESP activated")
-            -- Add Chair ESP code here
-        end},
-        {Name = "Auto Win", Callback = function()
-            print("Auto Win activated")
-            -- Add Auto Win code here
-        end},
-    }
+-- Tabs
+local tabsBar = New("Frame", {
+    Parent = window,
+    BackgroundColor3 = Color3.fromRGB(26, 26, 26),
+    BorderSizePixel = 0,
+    Position = UDim2.fromOffset(12, 64),
+    Size = UDim2.new(1, -24, 0, 36),
+})
+New("UICorner", { Parent = tabsBar, CornerRadius = UDim.new(0, 8) })
+New("UIStroke", { Parent = tabsBar, Thickness = 1, Color = COLORS.border })
+setPadding(tabsBar, 6)
+local tabsList = New("UIListLayout", {
+    Parent = tabsBar,
+    FillDirection = Enum.FillDirection.Horizontal,
+    Padding = UDim.new(0, 8),
+    HorizontalAlignment = Enum.HorizontalAlignment.Left,
+    VerticalAlignment = Enum.VerticalAlignment.Center,
+})
 
-    local startX, startY, spacingX, spacingY = 0.1, 0.1, 0.05, 0.05
-    local buttonWidth, buttonHeight = 0.35, 0.15
+local pagesContainer = New("Frame", {
+    Parent = window,
+    BackgroundTransparency = 1,
+    Position = UDim2.fromOffset(12, 108),
+    Size = UDim2.new(1, -24, 1, -120),
+})
+local pages = {}
+local currentPage = nil
 
-    for i, btnInfo in ipairs(buttons) do
-        local btn = Instance.new("TextButton")
-        btn.Size = UDim2.new(buttonWidth,0,buttonHeight,0)
-        local col = (i-1) % 2
-        local row = math.floor((i-1)/2)
-        btn.Position = UDim2.new(startX + col*(buttonWidth + spacingX),0,startY + row*(buttonHeight + spacingY),0)
-        btn.Text = btnInfo.Name
-        btn.BackgroundColor3 = Color3.fromRGB(70,70,70)
-        btn.TextColor3 = Color3.fromRGB(255,255,255)
-        btn.Font = Enum.Font.Gotham
-        btn.TextSize = 18
-        btn.Parent = modsFrame
-        local corner = Instance.new("UICorner")
-        corner.CornerRadius = UDim.new(0,10)
-        corner.Parent = btn
-
-        btn.MouseEnter:Connect(function()
-            btn.BackgroundColor3 = Color3.fromRGB(90,90,90)
-        end)
-        btn.MouseLeave:Connect(function()
-            btn.BackgroundColor3 = Color3.fromRGB(70,70,70)
-        end)
-
-        btn.MouseButton1Click:Connect(btnInfo.Callback)
+local function selectTab(name)
+    for tabName, page in pairs(pages) do
+        page.Visible = (tabName == name)
     end
+    currentPage = name
 end
 
--- Main Menu with vertical sidebar tabs
-local function createMainMenu()
-    local MainFrame = Instance.new("Frame")
-    MainFrame.Size = UDim2.new(0,420,0,320)
-    MainFrame.Position = UDim2.new(0.5,-210,0.5,-160)
-    MainFrame.BackgroundColor3 = Color3.fromRGB(25,25,25)
-    MainFrame.ClipsDescendants = true
-    MainFrame.Parent = ScreenGui
-    local UICornerMenu = Instance.new("UICorner")
-    UICornerMenu.CornerRadius = UDim.new(0,20)
-    UICornerMenu.Parent = MainFrame
-    makeDraggable(MainFrame)
+local function makeTab(name)
+    local btn = New("TextButton", {
+        Parent = tabsBar,
+        AutoButtonColor = false,
+        Text = name,
+        Font = Enum.Font.GothamSemibold,
+        TextSize = 14,
+        TextColor3 = COLORS.text,
+        BackgroundColor3 = Color3.fromRGB(36, 36, 36),
+        Size = UDim2.fromOffset(120, 24),
+    })
+    New("UICorner", { Parent = btn, CornerRadius = UDim.new(0, 6) })
+    New("UIStroke", { Parent = btn, Thickness = 1, Color = COLORS.border })
 
-    local MenuTitle = Instance.new("TextLabel")
-    MenuTitle.Size = UDim2.new(1,0,0,40)
-    MenuTitle.Position = UDim2.new(0,0,0,0)
-    MenuTitle.BackgroundTransparency = 1
-    MenuTitle.Text = "IEEF Hub - Main Menu"
-    MenuTitle.TextColor3 = Color3.fromRGB(255,255,255)
-    MenuTitle.Font = Enum.Font.GothamBold
-    MenuTitle.TextSize = 22
-    MenuTitle.Parent = MainFrame
+    local page = New("Frame", {
+        Parent = pagesContainer,
+        Visible = false,
+        BackgroundTransparency = 1,
+        Size = UDim2.fromScale(1, 1),
+    })
+    pages[name] = page
 
-    -- Sidebar
-    local Sidebar = Instance.new("Frame")
-    Sidebar.Size = UDim2.new(0,120,1,0)
-    Sidebar.Position = UDim2.new(0,0,0,0)
-    Sidebar.BackgroundTransparency = 1
-    Sidebar.Parent = MainFrame
-
-    local function createSidebarTab(name, yPos)
-        local btn = Instance.new("TextButton")
-        btn.Size = UDim2.new(1,-20,0,50)
-        btn.Position = UDim2.new(0,10,0,yPos)
-        btn.Text = name
-        btn.BackgroundColor3 = Color3.fromRGB(50,50,50)
-        btn.TextColor3 = Color3.fromRGB(200,200,200)
-        btn.Font = Enum.Font.Gotham
-        btn.TextSize = 18
-        btn.Parent = Sidebar
-
-        local corner = Instance.new("UICorner")
-        corner.CornerRadius = UDim.new(0,12)
-        corner.Parent = btn
-
-        btn.MouseEnter:Connect(function()
-            btn.BackgroundColor3 = Color3.fromRGB(70,70,70)
-        end)
-        btn.MouseLeave:Connect(function()
-            if not btn.Active then
-                btn.BackgroundColor3 = Color3.fromRGB(50,50,50)
+    btn.MouseButton1Click:Connect(function()
+        selectTab(name)
+        -- Tween highlight
+        TweenService:Create(btn, TweenInfo.new(0.1), { BackgroundColor3 = COLORS.primary }):Play()
+        for _, otherBtn in pairs(tabsBar:GetChildren()) do
+            if otherBtn:IsA("TextButton") and otherBtn ~= btn then
+                otherBtn.BackgroundColor3 = Color3.fromRGB(36, 36, 36)
             end
-        end)
-
-        return btn
-    end
-
-    local ModsTab = createSidebarTab("Mods",50)
-    local SettingsTab = createSidebarTab("Settings",120)
-
-    -- Content Frame
-    local ContentFrame = Instance.new("Frame")
-    ContentFrame.Size = UDim2.new(1,-120,1,0)
-    ContentFrame.Position = UDim2.new(0,120,0,0)
-    ContentFrame.BackgroundTransparency = 1
-    ContentFrame.Parent = MainFrame
-
-    local ModsFrame = Instance.new("Frame")
-    ModsFrame.Size = UDim2.new(1,0,1,0)
-    ModsFrame.Position = UDim2.new(0,0,0,0)
-    ModsFrame.BackgroundTransparency = 1
-    ModsFrame.Parent = ContentFrame
-
-    local SettingsFrame = Instance.new("Frame")
-    SettingsFrame.Size = UDim2.new(1,0,1,0)
-    SettingsFrame.Position = UDim2.new(0,0,0,0)
-    SettingsFrame.BackgroundTransparency = 1
-    SettingsFrame.Visible = false
-    SettingsFrame.Parent = ContentFrame
-
-    local ExampleSetting = Instance.new("TextLabel")
-    ExampleSetting.Size = UDim2.new(0.8,0,0,30)
-    ExampleSetting.Position = UDim2.new(0.1,0,0.1,0)
-    ExampleSetting.Text = "Settings will go here"
-    ExampleSetting.TextColor3 = Color3.fromRGB(255,255,255)
-    ExampleSetting.BackgroundTransparency = 1
-    ExampleSetting.Font = Enum.Font.Gotham
-    ExampleSetting.TextSize = 18
-    ExampleSetting.Parent = SettingsFrame
-
-    -- Tab switching
-    local function activateTab(activeTab, otherTab, frameToShow, frameToHide)
-        activeTab.Active = true
-        activeTab.BackgroundColor3 = Color3.fromRGB(100,100,100)
-        otherTab.Active = false
-        otherTab.BackgroundColor3 = Color3.fromRGB(50,50,50)
-        frameToShow.Visible = true
-        frameToHide.Visible = false
-    end
-
-    ModsTab.MouseButton1Click:Connect(function()
-        activateTab(ModsTab, SettingsTab, ModsFrame, SettingsFrame)
+        end
     end)
-    SettingsTab.MouseButton1Click:Connect(function()
-        activateTab(SettingsTab, ModsTab, SettingsFrame, ModsFrame)
-    end)
-
-    activateTab(ModsTab, SettingsTab, ModsFrame, SettingsFrame)
-
-    -- Setup Mods buttons
-    setupModsTab(ModsFrame)
+    return page
 end
 
--- Key validation
-SubmitButton.MouseButton1Click:Connect(function()
-    local key = KeyBox.Text
-    if validKeys[key] then
-        KeyFrame:Destroy()
-        createMainMenu()
-    else
-        InvalidLabel.Text = "Invalid Key! Copy Discord link above."
-        InvalidLabel.TextColor3 = Color3.fromRGB(255,50,50)
-    end
-end)
+-- Example tabs
+local aimbotTab = makeTab("Aimbot")
+local visualsTab = makeTab("Visuals")
+local movementTab = makeTab("Movement")
+local miscTab = makeTab("Misc")
+selectTab("Aimbot") -- Default tab
+
+-- Example content
+local function addLabel(tab, text)
+    local lbl = New("TextLabel", {
+        Parent = tab,
+        Text = text,
+        TextColor3 = COLORS.text,
+        Font = Enum.Font.GothamSemibold,
+        TextSize = 14,
+        BackgroundTransparency = 1,
+        Size = UDim2.new(1, 0, 0, 24),
+    })
+    return lbl
+end
+
+addLabel(aimbotTab, "Aimbot Enabled: "..tostring(State.aimbot.enabled))
+addLabel(visualsTab, "ESP: "..tostring(State.visuals.esp))
+addLabel(movementTab, "Fly: "..tostring(State.movement.fly))
+addLabel(miscTab, "BHop: "..tostring(State.misc.bhop))
