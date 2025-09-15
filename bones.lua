@@ -1,23 +1,21 @@
--- MASTXR Hub - Musical Chairs (Custom GUI + Auto Sit + Speed + Anti-Kick)
+-- MASTXR Hub Custom GUI for Musical Chairs
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
-local RunService = game:GetService("RunService")
-local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
 
 -- ================== GUI ==================
 local gui = Instance.new("ScreenGui")
-gui.Name = "MASTXRHubGui"
-gui.ResetOnSpawn = false
+gui.Name = "MASTXRHub"
 gui.Parent = player:WaitForChild("PlayerGui")
 
+-- Main Frame
 local frame = Instance.new("Frame")
-frame.Size = UDim2.new(0, 350, 0, 180)
+frame.Size = UDim2.new(0, 350, 0, 200)
 frame.Position = UDim2.new(0.5, -175, 0.1, 0)
 frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 frame.BorderSizePixel = 0
 frame.Parent = gui
-frame.ClipsDescendants = true
 
 -- Rounded corners
 local uicorner = Instance.new("UICorner", frame)
@@ -48,18 +46,18 @@ closeBtn.MouseButton1Click:Connect(function()
     gui:Destroy()
 end)
 
--- ================== Toggle Function ==================
+-- ================== Toggle ==================
 local function CreateToggle(parent, name, default, callback)
-    local btnFrame = Instance.new("Frame", parent)
-    btnFrame.Size = UDim2.new(1,-40,0,40)
-    btnFrame.Position = UDim2.new(0,20,0,#parent:GetChildren()*45)
-    btnFrame.BackgroundColor3 = Color3.fromRGB(45,45,45)
-    btnFrame.BorderSizePixel = 0
-    local uic = Instance.new("UICorner", btnFrame)
+    local container = Instance.new("Frame", parent)
+    container.Size = UDim2.new(1, -40, 0, 40)
+    container.Position = UDim2.new(0, 20, 0, #parent:GetChildren() * 45)
+    container.BackgroundColor3 = Color3.fromRGB(45,45,45)
+    container.BorderSizePixel = 0
+    local uic = Instance.new("UICorner", container)
     uic.CornerRadius = UDim.new(0,8)
 
-    local label = Instance.new("TextLabel", btnFrame)
-    label.Size = UDim2.new(0.7,0,1,0)
+    local label = Instance.new("TextLabel", container)
+    label.Size = UDim2.new(0.7, 0, 1, 0)
     label.Position = UDim2.new(0,10,0,0)
     label.Text = name
     label.Font = Enum.Font.GothamBold
@@ -67,7 +65,7 @@ local function CreateToggle(parent, name, default, callback)
     label.TextColor3 = Color3.fromRGB(255,255,255)
     label.BackgroundTransparency = 1
 
-    local toggle = Instance.new("TextButton", btnFrame)
+    local toggle = Instance.new("TextButton", container)
     toggle.Size = UDim2.new(0.25,0,0.6,0)
     toggle.Position = UDim2.new(0.72,0,0.2,0)
     toggle.Text = default and "ON" or "OFF"
@@ -87,17 +85,17 @@ local function CreateToggle(parent, name, default, callback)
     end)
 end
 
--- ================== Slider Function ==================
+-- ================== Slider ==================
 local function CreateSlider(parent, name, min, max, default, callback)
-    local sliderFrame = Instance.new("Frame", parent)
-    sliderFrame.Size = UDim2.new(1,-40,0,30)
-    sliderFrame.Position = UDim2.new(0,20,0,#parent:GetChildren()*35)
-    sliderFrame.BackgroundColor3 = Color3.fromRGB(50,50,50)
-    sliderFrame.BorderSizePixel = 0
-    local uic = Instance.new("UICorner", sliderFrame)
+    local container = Instance.new("Frame", parent)
+    container.Size = UDim2.new(1,-40,0,30)
+    container.Position = UDim2.new(0,20,0,#parent:GetChildren()*35)
+    container.BackgroundColor3 = Color3.fromRGB(50,50,50)
+    container.BorderSizePixel = 0
+    local uic = Instance.new("UICorner", container)
     uic.CornerRadius = UDim.new(0,6)
 
-    local label = Instance.new("TextLabel", sliderFrame)
+    local label = Instance.new("TextLabel", container)
     label.Size = UDim2.new(0.5,0,1,0)
     label.Position = UDim2.new(0,5,0,0)
     label.Text = name.." "..tostring(default)
@@ -106,7 +104,7 @@ local function CreateSlider(parent, name, min, max, default, callback)
     label.TextColor3 = Color3.fromRGB(255,255,255)
     label.BackgroundTransparency = 1
 
-    local bar = Instance.new("Frame", sliderFrame)
+    local bar = Instance.new("Frame", container)
     bar.Size = UDim2.new(1,-10,0.4,0)
     bar.Position = UDim2.new(0,5,0.55,0)
     bar.BackgroundColor3 = Color3.fromRGB(100,100,100)
@@ -121,14 +119,10 @@ local function CreateSlider(parent, name, min, max, default, callback)
 
     local dragging = false
     bar.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            dragging = true
-        end
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then dragging = true end
     end)
     bar.InputEnded:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            dragging = false
-        end
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then dragging = false end
     end)
     UserInputService.InputChanged:Connect(function(input)
         if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
@@ -141,96 +135,13 @@ local function CreateSlider(parent, name, min, max, default, callback)
     end)
 end
 
--- ================== Anti-Kick ==================
-do
-    local mt = getrawmetatable(game)
-    local oldNamecall = mt.__namecall
-    setreadonly(mt,false)
-    mt.__namecall = newcclosure(function(self,...)
-        local method = getnamecallmethod()
-        if method == "Kick" then return nil end
-        return oldNamecall(self,...)
-    end)
-    setreadonly(mt,true)
-end
-
--- ================== Auto Sit Logic ==================
-local autoEnabled = false
-local autoLoop
-local function getTargetChair()
-    local spinner = workspace:FindFirstChild("SpinnerStuff")
-    if spinner and spinner:FindFirstChild("ChairSpots") then
-        for _, spot in pairs(spinner.ChairSpots:GetChildren()) do
-            if spot:FindFirstChild("ChairParts") and spot.ChairParts:FindFirstChild("Cushion") then
-                local cushion = spot.ChairParts.Cushion
-                if cushion and not cushion.Occupant then
-                    return cushion
-                end
-            end
-        end
-    end
-    return nil
-end
-
-local function smoothTeleport(targetPos)
-    local char = player.Character or player.CharacterAdded:Wait()
-    local root = char:WaitForChild("HumanoidRootPart")
-    local offset = Vector3.new(math.random()*0.5,0,math.random()*0.5)
-    root.CFrame = root.CFrame:Lerp(targetPos + Vector3.new(0,5,0) + offset,0.35)
-end
-
--- ================== Speed Logic ==================
-local currentSpeed = 16
-local function applySpeed(value)
-    local char = player.Character
-    if char and char:FindFirstChild("Humanoid") then
-        local hum = char.Humanoid
-        task.spawn(function()
-            local step = (value - hum.WalkSpeed)/5
-            for i=1,5 do
-                hum.WalkSpeed = hum.WalkSpeed + step
-                task.wait(0.05)
-            end
-            hum.WalkSpeed = value
-        end)
-    end
-end
-
--- ================== GUI Controls ==================
+-- ================== Example Controls ==================
 CreateToggle(frame,"Auto Sit",false,function(state)
-    autoEnabled = state
-    if state then
-        autoLoop = task.spawn(function()
-            while autoEnabled do
-                local target = getTargetChair()
-                if target then
-                    smoothTeleport(target.Position)
-                end
-                task.wait(0.7 + math.random()*0.3)
-            end
-        end)
-    else
-        if autoLoop then task.cancel(autoLoop) end
-    end
+    print("Auto Sit:",state)
 end)
 
 CreateSlider(frame,"Speed Boost",16,100,16,function(value)
-    currentSpeed = value
-    applySpeed(value)
+    print("Speed:",value)
 end)
 
--- ================== Notification ==================
-local function notify(msg)
-    local notif = Instance.new("TextLabel", frame)
-    notif.Size = UDim2.new(1,-40,0,25)
-    notif.Position = UDim2.new(0,20,0,frame.Size.Y.Offset - 30)
-    notif.BackgroundTransparency = 0.5
-    notif.BackgroundColor3 = Color3.fromRGB(0,0,0)
-    notif.TextColor3 = Color3.new(1,1,1)
-    notif.Font = Enum.Font.GothamBold
-    notif.TextSize = 14
-    notif.Text = msg
-    task.delay(3,function() notif:Destroy() end)
-end
-
-notify("MASTXR Hub Loaded Successfully!")
+print("Custom MASTXR Hub Loaded!")
