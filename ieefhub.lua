@@ -8,7 +8,7 @@ local player = Players.LocalPlayer
 
 -- GUI Config
 local DISCORD_LINK = "https://discord.gg/Q9caeDr2M8"
-local VALID_KEY = "SWEB123" -- example key
+local VALID_KEY = "ieefkey2" -- example key
 
 -- States
 local speedSafe = false
