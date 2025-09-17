@@ -1,5 +1,5 @@
--- LocalScript: IEEF HUB with Key System + Mini Menu
--- Place inside StarterPlayerScripts or StarterGui
+-- LocalScript: IEEF HUB Key + Mini Menu
+-- Place in StarterPlayerScripts or StarterGui
 
 local Players = game:GetService("Players")
 local UIS = game:GetService("UserInputService")
@@ -9,7 +9,7 @@ local character = player.Character or player.CharacterAdded:Wait()
 local humanoid = character:WaitForChild("Humanoid")
 
 -- Config
-local VALID_KEY = "ieef123" -- change as you like
+local VALID_KEY = "ieef123" -- the key
 local DISCORD_LINK = "https://discord.gg/Q9caeDr2M8"
 
 -- States
@@ -23,12 +23,12 @@ ScreenGui.Parent = player:WaitForChild("PlayerGui")
 ScreenGui.ResetOnSpawn = false
 
 ----------------------
--- KEY GUI
+-- CENTER KEY GUI
 ----------------------
 local KeyFrame = Instance.new("Frame")
 KeyFrame.Size = UDim2.new(0, 300, 0, 180)
-KeyFrame.Position = UDim2.new(0.35,0,0.35,0)
-KeyFrame.BackgroundColor3 = Color3.fromRGB(30,30,30)
+KeyFrame.Position = UDim2.new(0.5, -150, 0.5, -90) -- centered
+KeyFrame.BackgroundColor3 = Color3.fromRGB(0,0,0) -- black background
 KeyFrame.BorderSizePixel = 0
 KeyFrame.Active = true
 KeyFrame.Draggable = true
@@ -36,10 +36,11 @@ KeyFrame.Parent = ScreenGui
 Instance.new("UICorner", KeyFrame).CornerRadius = UDim.new(0,12)
 
 local KeyTitle = Instance.new("TextLabel")
-KeyTitle.Text = "Enter Key"
+KeyTitle.Text = "IEEF HUB"
 KeyTitle.Size = UDim2.new(1,0,0,40)
+KeyTitle.Position = UDim2.new(0,0,0,5)
 KeyTitle.BackgroundTransparency = 1
-KeyTitle.TextColor3 = Color3.fromRGB(0,255,128)
+KeyTitle.TextColor3 = Color3.fromRGB(255,255,255) -- white
 KeyTitle.Font = Enum.Font.GothamBold
 KeyTitle.TextScaled = true
 KeyTitle.Parent = KeyFrame
@@ -65,11 +66,11 @@ StatusText.TextScaled = true
 StatusText.Text = ""
 StatusText.Parent = KeyFrame
 
--- Check Key Button
+-- Buttons inside key GUI
 local CheckKeyBtn = Instance.new("TextButton")
 CheckKeyBtn.Size = UDim2.new(0.45,0,0,30)
 CheckKeyBtn.Position = UDim2.new(0.05,0,0.55,0)
-CheckKeyBtn.BackgroundColor3 = Color3.fromRGB(70,70,70)
+CheckKeyBtn.BackgroundColor3 = Color3.fromRGB(0,200,0)
 CheckKeyBtn.TextColor3 = Color3.fromRGB(255,255,255)
 CheckKeyBtn.Text = "Check Key"
 CheckKeyBtn.Font = Enum.Font.Gotham
@@ -77,11 +78,10 @@ CheckKeyBtn.TextScaled = true
 CheckKeyBtn.Parent = KeyFrame
 Instance.new("UICorner", CheckKeyBtn).CornerRadius = UDim.new(0,8)
 
--- Discord Button
 local DiscordBtn = Instance.new("TextButton")
 DiscordBtn.Size = UDim2.new(0.45,0,0,30)
 DiscordBtn.Position = UDim2.new(0.5,0,0.55,0)
-DiscordBtn.BackgroundColor3 = Color3.fromRGB(70,70,70)
+DiscordBtn.BackgroundColor3 = Color3.fromRGB(200,0,0)
 DiscordBtn.TextColor3 = Color3.fromRGB(255,255,255)
 DiscordBtn.Text = "Discord"
 DiscordBtn.Font = Enum.Font.Gotham
@@ -92,7 +92,7 @@ Instance.new("UICorner", DiscordBtn).CornerRadius = UDim.new(0,8)
 -- Notifications
 local function ShowNotification(msg,color)
 	local notif = Instance.new("TextLabel")
-	notif.Size = UDim2.new(0,180,0,30)
+	notif.Size = UDim2.new(0,200,0,30)
 	notif.Position = UDim2.new(0,10,1,-170)
 	notif.BackgroundColor3 = Color3.fromRGB(40,40,40)
 	notif.TextColor3 = color or Color3.fromRGB(255,255,255)
@@ -104,13 +104,13 @@ local function ShowNotification(msg,color)
 	game:GetService("Debris"):AddItem(notif,2)
 end
 
--- Key check logic
+-- Key check
 CheckKeyBtn.MouseButton1Click:Connect(function()
 	if KeyBox.Text == VALID_KEY then
 		StatusText.Text = ""
 		KeyFrame.Visible = false
 		ShowNotification("Key accepted! Loading IEEF HUB...", Color3.fromRGB(0,255,128))
-		task.wait(1)
+		task.wait(0.5)
 		MiniMenu.Visible = true
 	else
 		StatusText.Text = "Invalid Key"
@@ -126,7 +126,7 @@ DiscordBtn.MouseButton1Click:Connect(function()
 end)
 
 ----------------------
--- MINI MENU
+-- MINI MENU (bottom-left)
 ----------------------
 local MiniMenu = Instance.new("Frame")
 MiniMenu.Size = UDim2.new(0, 200, 0, 130)
