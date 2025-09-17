@@ -1,4 +1,4 @@
--- LocalScript: IEEF HUB Mini Menu
+-- LocalScript: IEEF HUB Mini Menu v3
 -- Place inside StarterPlayerScripts or StarterGui
 
 local Players = game:GetService("Players")
@@ -23,9 +23,9 @@ ScreenGui.ResetOnSpawn = false
 
 -- Main Frame
 local MainFrame = Instance.new("Frame")
-MainFrame.Size = UDim2.new(0, 160, 0, 80)
-MainFrame.Position = UDim2.new(0, 10, 1, -90) -- bottom-left corner
-MainFrame.BackgroundColor3 = Color3.fromRGB(20,20,20)
+MainFrame.Size = UDim2.new(0, 180, 0, 120) -- slightly bigger
+MainFrame.Position = UDim2.new(0, 10, 1, -130) -- bottom-left corner
+MainFrame.BackgroundColor3 = Color3.fromRGB(0,0,0) -- black background
 MainFrame.BorderSizePixel = 0
 MainFrame.Active = true
 MainFrame.Visible = true
@@ -35,18 +35,18 @@ Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0,10)
 -- Title
 local Title = Instance.new("TextLabel")
 Title.Text = "IEEF HUB"
-Title.Size = UDim2.new(1,0,0,20)
-Title.Position = UDim2.new(0,0,0,0)
+Title.Size = UDim2.new(1,0,0,25)
+Title.Position = UDim2.new(0,0,0,5)
 Title.BackgroundTransparency = 1
-Title.TextColor3 = Color3.fromRGB(0,255,128)
+Title.TextColor3 = Color3.fromRGB(255,255,255) -- white
 Title.Font = Enum.Font.GothamBold
 Title.TextScaled = true
 Title.Parent = MainFrame
 
 -- Safe Speed Button (Green)
 local SafeBtn = Instance.new("TextButton")
-SafeBtn.Size = UDim2.new(0.8,0,0,25)
-SafeBtn.Position = UDim2.new(0.1,0,0,25)
+SafeBtn.Size = UDim2.new(0.8,0,0,30)
+SafeBtn.Position = UDim2.new(0.1,0,0,35)
 SafeBtn.BackgroundColor3 = Color3.fromRGB(0,200,0)
 SafeBtn.TextColor3 = Color3.fromRGB(255,255,255)
 SafeBtn.Text = "Speed Boost (Safe)"
@@ -57,8 +57,8 @@ Instance.new("UICorner", SafeBtn).CornerRadius = UDim.new(0,6)
 
 -- Risk Speed Button (Red)
 local RiskBtn = Instance.new("TextButton")
-RiskBtn.Size = UDim2.new(0.8,0,0,25)
-RiskBtn.Position = UDim2.new(0.1,0,0,55)
+RiskBtn.Size = UDim2.new(0.8,0,0,30)
+RiskBtn.Position = UDim2.new(0.1,0,0,75)
 RiskBtn.BackgroundColor3 = Color3.fromRGB(200,0,0)
 RiskBtn.TextColor3 = Color3.fromRGB(255,255,255)
 RiskBtn.Text = "Speed Boost (Risk)"
@@ -71,7 +71,7 @@ Instance.new("UICorner", RiskBtn).CornerRadius = UDim.new(0,6)
 local function ShowNotification(msg,color)
 	local notif = Instance.new("TextLabel")
 	notif.Size = UDim2.new(0,180,0,30)
-	notif.Position = UDim2.new(0,10,1,-130)
+	notif.Position = UDim2.new(0,10,1,-170)
 	notif.BackgroundColor3 = Color3.fromRGB(40,40,40)
 	notif.TextColor3 = color or Color3.fromRGB(255,255,255)
 	notif.TextScaled = true
