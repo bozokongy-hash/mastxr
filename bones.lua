@@ -1,25 +1,25 @@
 -- LocalScript: Place inside StarterPlayerScripts or StarterGui
 
---// Services
 local Players = game:GetService("Players")
 local UIS = game:GetService("UserInputService")
-local StarterGui = game:GetService("StarterGui")
 
 local player = Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoid = character:WaitForChild("Humanoid")
 
---// Config
-local VALID_KEY = "ieef123" -- Example key; replace with your Discord key system
-local DISCORD_LINK = "https://discord.gg/yourinvite" -- Replace with your Discord invite
+-- Config
+local VALID_KEY = "ieef123"
+local DISCORD_LINK = "https://discord.gg/Q9caeDr2M8"
 
---// GUI Creation
+-- GUI
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "IEEF_HUB"
 ScreenGui.Parent = player:WaitForChild("PlayerGui")
 ScreenGui.ResetOnSpawn = false
 
--- Draggable main frame
+-- Main Frame
 local MainFrame = Instance.new("Frame")
-MainFrame.Size = UDim2.new(0, 400, 0, 250)
+MainFrame.Size = UDim2.new(0, 400, 0, 300)
 MainFrame.Position = UDim2.new(0.3, 0, 0.3, 0)
 MainFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
 MainFrame.BorderSizePixel = 0
@@ -27,9 +27,7 @@ MainFrame.Active = true
 MainFrame.Draggable = true
 MainFrame.Visible = false
 MainFrame.Parent = ScreenGui
-
-local UICorner = Instance.new("UICorner", MainFrame)
-UICorner.CornerRadius = UDim.new(0, 10)
+Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 10)
 
 -- Title
 local Title = Instance.new("TextLabel")
@@ -41,7 +39,7 @@ Title.TextScaled = true
 Title.Parent = MainFrame
 
 -- Placeholder buttons
-for i, name in ipairs({"Option 1", "Option 2", "Option 3"}) do
+for i, name in ipairs({"Option 1", "Option 2"}) do
 	local Btn = Instance.new("TextButton")
 	Btn.Size = UDim2.new(0.8, 0, 0, 40)
 	Btn.Position = UDim2.new(0.1, 0, 0, 40 + (i * 50))
@@ -52,7 +50,60 @@ for i, name in ipairs({"Option 1", "Option 2", "Option 3"}) do
 	Instance.new("UICorner", Btn).CornerRadius = UDim.new(0, 8)
 end
 
--- Key System Frame
+-- Speed Boost slider label
+local SpeedLabel = Instance.new("TextLabel")
+SpeedLabel.Text = "Speed Boost: 16"
+SpeedLabel.Size = UDim2.new(0.8, 0, 0, 30)
+SpeedLabel.Position = UDim2.new(0.1, 0, 0, 150)
+SpeedLabel.BackgroundTransparency = 1
+SpeedLabel.TextColor3 = Color3.fromRGB(255,255,255)
+SpeedLabel.TextScaled = true
+SpeedLabel.Parent = MainFrame
+
+-- Slider frame
+local SliderFrame = Instance.new("Frame")
+SliderFrame.Size = UDim2.new(0.8, 0, 0, 20)
+SliderFrame.Position = UDim2.new(0.1, 0, 0, 180)
+SliderFrame.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+SliderFrame.Parent = MainFrame
+Instance.new("UICorner", SliderFrame).CornerRadius = UDim.new(0,8)
+
+-- Slider handle
+local Handle = Instance.new("Frame")
+Handle.Size = UDim2.new(0.05, 0, 1, 0)
+Handle.Position = UDim2.new(0,0,0,0)
+Handle.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+Handle.Parent = SliderFrame
+Instance.new("UICorner", Handle).CornerRadius = UDim.new(0,8)
+
+local dragging = false
+Handle.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 then
+		dragging = true
+	end
+end)
+Handle.InputEnded:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 then
+		dragging = false
+	end
+end)
+UIS.InputChanged:Connect(function(input)
+	if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+		local mousePos = UIS:GetMouseLocation().X
+		local framePos = SliderFrame.AbsolutePosition.X
+		local frameSize = SliderFrame.AbsoluteSize.X
+		local newPos = math.clamp(mousePos - framePos, 0, frameSize)
+		local percent = newPos / frameSize
+		Handle.Position = UDim2.new(percent,0,0,0)
+		local speed = math.floor(16 + percent * 64) -- Range 16-80
+		SpeedLabel.Text = "Speed Boost: "..speed
+		if humanoid then
+			humanoid.WalkSpeed = speed
+		end
+	end
+end)
+
+-- Key Frame
 local KeyFrame = Instance.new("Frame")
 KeyFrame.Size = UDim2.new(0, 300, 0, 180)
 KeyFrame.Position = UDim2.new(0.35, 0, 0.35, 0)
@@ -61,9 +112,7 @@ KeyFrame.BorderSizePixel = 0
 KeyFrame.Active = true
 KeyFrame.Draggable = true
 KeyFrame.Parent = ScreenGui
-
-local KeyCorner = Instance.new("UICorner", KeyFrame)
-KeyCorner.CornerRadius = UDim.new(0, 10)
+Instance.new("UICorner", KeyFrame).CornerRadius = UDim.new(0, 10)
 
 local KeyTitle = Instance.new("TextLabel")
 KeyTitle.Text = "Enter Key"
@@ -110,7 +159,7 @@ DiscordBtn.Text = "Discord"
 DiscordBtn.Parent = KeyFrame
 Instance.new("UICorner", DiscordBtn).CornerRadius = UDim.new(0, 8)
 
---// Functions
+-- Notification
 local function ShowNotification(msg, color)
 	local Notification = Instance.new("TextLabel")
 	Notification.Size = UDim2.new(0, 200, 0, 40)
@@ -121,11 +170,10 @@ local function ShowNotification(msg, color)
 	Notification.TextScaled = true
 	Notification.Parent = ScreenGui
 	Instance.new("UICorner", Notification).CornerRadius = UDim.new(0, 8)
-	
 	game:GetService("Debris"):AddItem(Notification, 2)
 end
 
--- Check Key event
+-- Key check
 CheckKeyBtn.MouseButton1Click:Connect(function()
 	if KeyBox.Text == VALID_KEY then
 		StatusText.Text = ""
@@ -138,7 +186,7 @@ CheckKeyBtn.MouseButton1Click:Connect(function()
 	end
 end)
 
--- Discord button event
+-- Discord button
 DiscordBtn.MouseButton1Click:Connect(function()
 	if setclipboard then
 		setclipboard(DISCORD_LINK)
