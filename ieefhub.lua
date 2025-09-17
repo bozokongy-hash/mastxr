@@ -1,4 +1,4 @@
--- LocalScript: IEEF HUB Mini Menu with KeySystem v5
+-- LocalScript: IEEF HUB Mini Menu with KeySystem v6
 -- Place inside StarterPlayerScripts
 
 local Players = game:GetService("Players")
@@ -41,10 +41,10 @@ local function ShowNotification(msg,color)
 	Debris:AddItem(notif,2)
 end
 
--- Key System Frame (same style as main menu)
+-- Key System Frame
 local KeyFrame = Instance.new("Frame")
-KeyFrame.Size = UDim2.new(0, 180, 0, 120)
-KeyFrame.Position = UDim2.new(0, 10, 1, -130)
+KeyFrame.Size = UDim2.new(0, 180, 0, 130)
+KeyFrame.Position = UDim2.new(0, 10, 1, -140)
 KeyFrame.BackgroundColor3 = Color3.fromRGB(0,0,0)
 KeyFrame.BorderSizePixel = 0
 KeyFrame.Active = true
@@ -63,14 +63,14 @@ KeyTitle.Font = Enum.Font.GothamBold
 KeyTitle.TextScaled = true
 KeyTitle.Parent = KeyFrame
 
--- Key Input Box (smaller, centered)
+-- Key Input Box
 local KeyBox = Instance.new("TextBox")
-KeyBox.Size = UDim2.new(0.7,0,0,25) -- smaller width and height
+KeyBox.Size = UDim2.new(0.7,0,0,25)
 KeyBox.Position = UDim2.new(0.15,0,0,45)
 KeyBox.BackgroundColor3 = Color3.fromRGB(30,30,30)
 KeyBox.TextColor3 = Color3.fromRGB(255,255,255)
 KeyBox.Text = ""
-KeyBox.PlaceholderText = "Enter key here" -- placeholder text
+KeyBox.PlaceholderText = "Enter key here"
 KeyBox.ClearTextOnFocus = false
 KeyBox.TextScaled = true
 KeyBox.Font = Enum.Font.Gotham
@@ -78,29 +78,37 @@ KeyBox.TextXAlignment = Enum.TextXAlignment.Center
 KeyBox.Parent = KeyFrame
 Instance.new("UICorner", KeyBox).CornerRadius = UDim.new(0,6)
 
--- Check Key Button (green)
+-- Check Key Button
 local CheckBtn = Instance.new("TextButton")
-CheckBtn.Size = UDim2.new(0.45,0,0,30) -- slightly larger
-CheckBtn.Position = UDim2.new(0.03,0,0,85) -- closer to left
+CheckBtn.Size = UDim2.new(0.45,0,0,35)
+CheckBtn.Position = UDim2.new(0.03,0,0,85)
 CheckBtn.BackgroundColor3 = Color3.fromRGB(0,200,0)
 CheckBtn.TextColor3 = Color3.fromRGB(255,255,255)
 CheckBtn.Text = "Check Key"
-CheckBtn.TextScaled = true
+CheckBtn.TextScaled = false
 CheckBtn.Font = Enum.Font.Gotham
+CheckBtn.TextSize = 18
+CheckBtn.TextWrapped = true
 CheckBtn.Parent = KeyFrame
 Instance.new("UICorner", CheckBtn).CornerRadius = UDim.new(0,6)
+Instance.new("UIPadding", CheckBtn).PaddingLeft = UDim.new(0,5)
+Instance.new("UIPadding", CheckBtn).PaddingRight = UDim.new(0,5)
 
--- Discord Button (red)
+-- Discord Button
 local DiscordBtn = Instance.new("TextButton")
-DiscordBtn.Size = UDim2.new(0.45,0,0,30) -- slightly larger
-DiscordBtn.Position = UDim2.new(0.52,0,0,85) -- closer to right
+DiscordBtn.Size = UDim2.new(0.45,0,0,35)
+DiscordBtn.Position = UDim2.new(0.52,0,0,85)
 DiscordBtn.BackgroundColor3 = Color3.fromRGB(200,0,0)
 DiscordBtn.TextColor3 = Color3.fromRGB(255,255,255)
 DiscordBtn.Text = "Discord"
-DiscordBtn.TextScaled = true
+DiscordBtn.TextScaled = false
 DiscordBtn.Font = Enum.Font.Gotham
+DiscordBtn.TextSize = 18
+DiscordBtn.TextWrapped = true
 DiscordBtn.Parent = KeyFrame
 Instance.new("UICorner", DiscordBtn).CornerRadius = UDim.new(0,6)
+Instance.new("UIPadding", DiscordBtn).PaddingLeft = UDim.new(0,5)
+Instance.new("UIPadding", DiscordBtn).PaddingRight = UDim.new(0,5)
 
 -- Discord Button Function
 DiscordBtn.MouseButton1Click:Connect(function()
@@ -130,7 +138,7 @@ Title.Font = Enum.Font.GothamBold
 Title.TextScaled = true
 Title.Parent = MainFrame
 
--- Safe Speed Button (Green)
+-- Safe Speed Button
 local SafeBtn = Instance.new("TextButton")
 SafeBtn.Size = UDim2.new(0.8,0,0,30)
 SafeBtn.Position = UDim2.new(0.1,0,0,35)
@@ -142,7 +150,7 @@ SafeBtn.TextScaled = true
 SafeBtn.Parent = MainFrame
 Instance.new("UICorner", SafeBtn).CornerRadius = UDim.new(0,6)
 
--- Risk Speed Button (Red)
+-- Risk Speed Button
 local RiskBtn = Instance.new("TextButton")
 RiskBtn.Size = UDim2.new(0.8,0,0,30)
 RiskBtn.Position = UDim2.new(0.1,0,0,75)
