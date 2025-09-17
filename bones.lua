@@ -19,7 +19,7 @@ ScreenGui.ResetOnSpawn = false
 
 -- Main Frame
 local MainFrame = Instance.new("Frame")
-MainFrame.Size = UDim2.new(0, 400, 0, 300)
+MainFrame.Size = UDim2.new(0, 400, 0, 200)
 MainFrame.Position = UDim2.new(0.3, 0, 0.3, 0)
 MainFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
 MainFrame.BorderSizePixel = 0
@@ -38,23 +38,11 @@ Title.TextColor3 = Color3.fromRGB(255, 255, 255)
 Title.TextScaled = true
 Title.Parent = MainFrame
 
--- Placeholder buttons
-for i, name in ipairs({"Option 1", "Option 2"}) do
-	local Btn = Instance.new("TextButton")
-	Btn.Size = UDim2.new(0.8, 0, 0, 40)
-	Btn.Position = UDim2.new(0.1, 0, 0, 40 + (i * 50))
-	Btn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-	Btn.TextColor3 = Color3.fromRGB(255, 255, 255)
-	Btn.Text = name
-	Btn.Parent = MainFrame
-	Instance.new("UICorner", Btn).CornerRadius = UDim.new(0, 8)
-end
-
--- Speed Boost slider label
+-- Speed Boost label
 local SpeedLabel = Instance.new("TextLabel")
 SpeedLabel.Text = "Speed Boost: 16"
 SpeedLabel.Size = UDim2.new(0.8, 0, 0, 30)
-SpeedLabel.Position = UDim2.new(0.1, 0, 0, 150)
+SpeedLabel.Position = UDim2.new(0.1, 0, 0, 50)
 SpeedLabel.BackgroundTransparency = 1
 SpeedLabel.TextColor3 = Color3.fromRGB(255,255,255)
 SpeedLabel.TextScaled = true
@@ -63,7 +51,7 @@ SpeedLabel.Parent = MainFrame
 -- Slider frame
 local SliderFrame = Instance.new("Frame")
 SliderFrame.Size = UDim2.new(0.8, 0, 0, 20)
-SliderFrame.Position = UDim2.new(0.1, 0, 0, 180)
+SliderFrame.Position = UDim2.new(0.1, 0, 0, 90)
 SliderFrame.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
 SliderFrame.Parent = MainFrame
 Instance.new("UICorner", SliderFrame).CornerRadius = UDim.new(0,8)
@@ -76,26 +64,28 @@ Handle.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
 Handle.Parent = SliderFrame
 Instance.new("UICorner", Handle).CornerRadius = UDim.new(0,8)
 
+-- Slider dragging
 local dragging = false
 Handle.InputBegan:Connect(function(input)
 	if input.UserInputType == Enum.UserInputType.MouseButton1 then
 		dragging = true
+		input.Changed:Connect(function()
+			if input.UserInputState == Enum.UserInputState.End then
+				dragging = false
+			end
+		end)
 	end
 end)
-Handle.InputEnded:Connect(function(input)
-	if input.UserInputType == Enum.UserInputType.MouseButton1 then
-		dragging = false
-	end
-end)
+
 UIS.InputChanged:Connect(function(input)
 	if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
-		local mousePos = UIS:GetMouseLocation().X
+		local mouseX = UIS:GetMouseLocation().X
 		local framePos = SliderFrame.AbsolutePosition.X
 		local frameSize = SliderFrame.AbsoluteSize.X
-		local newPos = math.clamp(mousePos - framePos, 0, frameSize)
+		local newPos = math.clamp(mouseX - framePos, 0, frameSize)
 		local percent = newPos / frameSize
 		Handle.Position = UDim2.new(percent,0,0,0)
-		local speed = math.floor(16 + percent * 64) -- Range 16-80
+		local speed = math.floor(16 + percent * 64) -- 16 -> 80
 		SpeedLabel.Text = "Speed Boost: "..speed
 		if humanoid then
 			humanoid.WalkSpeed = speed
