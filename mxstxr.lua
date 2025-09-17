@@ -79,20 +79,23 @@ Tabs.Hypershot:AddButton({
     Callback = ComingSoon("Hypershot Script 2")
 })
 
--- ===== NFL Universe Tab =====
-Tabs.NFLUniverse:AddButton({
-    Title = "Script 1",
-    Description = "NFL Universe - Main Script",
+-- ===== Musical Chairs Tab =====
+Tabs.MusicalChairs = Window:AddTab({ Title = "Musical Chairs", Icon = "shield" })
+
+Tabs.MusicalChairs:AddButton({
+    Title = "Ieef Script",
+    Description = "Musical Chairs - Main Script",
     Callback = function()
-        loadstring(game:HttpGet("https://pastebin.com/raw/your_nfl_script1"))()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/bozokongy-hash/mastxr/refs/heads/main/ieefcreation.lua"))()
         Window:Destroy()
     end
 })
-Tabs.NFLUniverse:AddButton({
+Tabs.MusicalChairs:AddButton({
     Title = "Script 2",
     Description = "Coming Soon",
-    Callback = ComingSoon("NFL Universe Script 2")
+    Callback = ComingSoon("Musical Chairs Script 2")
 })
+
 
 -- ===== Settings Tab =====
 SaveManager:SetLibrary(Fluent)
