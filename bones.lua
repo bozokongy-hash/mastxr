@@ -1,4 +1,4 @@
--- LocalScript: IEEF HUB Key + Mini Menu v2
+-- LocalScript: IEEF HUB Key + Mini Menu v3
 -- Place inside StarterPlayerScripts or StarterGui
 
 local Players = game:GetService("Players")
@@ -22,11 +22,11 @@ ScreenGui.Name = "IEEF_HUB"
 ScreenGui.Parent = player:WaitForChild("PlayerGui")
 ScreenGui.ResetOnSpawn = false
 
--- Notification function
+-- Notification function (will appear above the key GUI)
 local function ShowNotification(msg,color)
 	local notif = Instance.new("TextLabel")
-	notif.Size = UDim2.new(0,200,0,30)
-	notif.Position = UDim2.new(0,10,1,-170)
+	notif.Size = UDim2.new(0,220,0,25)
+	notif.Position = UDim2.new(0.5, -110, 0.5, -105) -- above key GUI
 	notif.BackgroundColor3 = Color3.fromRGB(40,40,40)
 	notif.TextColor3 = color or Color3.fromRGB(255,255,255)
 	notif.TextScaled = true
@@ -41,14 +41,14 @@ end
 -- CENTER KEY GUI
 ----------------------
 local KeyFrame = Instance.new("Frame")
-KeyFrame.Size = UDim2.new(0, 220, 0, 130) -- smaller to avoid overlap
+KeyFrame.Size = UDim2.new(0, 220, 0, 130)
 KeyFrame.Position = UDim2.new(0.5, -110, 0.5, -65)
 KeyFrame.BackgroundColor3 = Color3.fromRGB(0,0,0)
 KeyFrame.BorderSizePixel = 0
 KeyFrame.Active = true
 KeyFrame.Draggable = true
 KeyFrame.Parent = ScreenGui
-Instance.new("UICorner", KeyFrame).CornerRadius = UDim.new(0,10)
+Instance.new("UICorner", KeyFrame).CornerRadius = UDim.new(0,12)
 
 -- Title
 local KeyTitle = Instance.new("TextLabel")
@@ -73,21 +73,10 @@ KeyBox.TextScaled = true
 KeyBox.Parent = KeyFrame
 Instance.new("UICorner", KeyBox).CornerRadius = UDim.new(0,6)
 
--- Status Text
-local StatusText = Instance.new("TextLabel")
-StatusText.Size = UDim2.new(1,0,0,20)
-StatusText.Position = UDim2.new(0,0,0,65)
-StatusText.BackgroundTransparency = 1
-StatusText.TextColor3 = Color3.fromRGB(255,50,50)
-StatusText.Font = Enum.Font.Gotham
-StatusText.TextScaled = true
-StatusText.Text = ""
-StatusText.Parent = KeyFrame
-
--- Buttons
+-- Buttons stacked vertically in the middle
 local CheckKeyBtn = Instance.new("TextButton")
-CheckKeyBtn.Size = UDim2.new(0.45,0,0,25)
-CheckKeyBtn.Position = UDim2.new(0.05,0,0,90)
+CheckKeyBtn.Size = UDim2.new(0.8,0,0,25)
+CheckKeyBtn.Position = UDim2.new(0.1,0,0.6,0)
 CheckKeyBtn.BackgroundColor3 = Color3.fromRGB(0,200,0)
 CheckKeyBtn.TextColor3 = Color3.fromRGB(255,255,255)
 CheckKeyBtn.Text = "Check Key"
@@ -97,8 +86,8 @@ CheckKeyBtn.Parent = KeyFrame
 Instance.new("UICorner", CheckKeyBtn).CornerRadius = UDim.new(0,6)
 
 local DiscordBtn = Instance.new("TextButton")
-DiscordBtn.Size = UDim2.new(0.45,0,0,25)
-DiscordBtn.Position = UDim2.new(0.5,0,0,90)
+DiscordBtn.Size = UDim2.new(0.8,0,0,25)
+DiscordBtn.Position = UDim2.new(0.1,0,0.73,0) -- just below CheckKeyBtn
 DiscordBtn.BackgroundColor3 = Color3.fromRGB(200,0,0)
 DiscordBtn.TextColor3 = Color3.fromRGB(255,255,255)
 DiscordBtn.Text = "Discord"
@@ -107,7 +96,18 @@ DiscordBtn.TextScaled = true
 DiscordBtn.Parent = KeyFrame
 Instance.new("UICorner", DiscordBtn).CornerRadius = UDim.new(0,6)
 
--- Key check logic
+-- Status Text (hidden, optional)
+local StatusText = Instance.new("TextLabel")
+StatusText.Size = UDim2.new(1,0,0,20)
+StatusText.Position = UDim2.new(0,0,0.88,0)
+StatusText.BackgroundTransparency = 1
+StatusText.TextColor3 = Color3.fromRGB(255,50,50)
+StatusText.Font = Enum.Font.Gotham
+StatusText.TextScaled = true
+StatusText.Text = ""
+StatusText.Parent = KeyFrame
+
+-- Key logic
 CheckKeyBtn.MouseButton1Click:Connect(function()
 	if KeyBox.Text == VALID_KEY then
 		StatusText.Text = ""
@@ -117,6 +117,7 @@ CheckKeyBtn.MouseButton1Click:Connect(function()
 		MiniMenu.Visible = true
 	else
 		StatusText.Text = "Invalid Key"
+		ShowNotification("Invalid Key!", Color3.fromRGB(255,50,50))
 	end
 end)
 
