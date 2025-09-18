@@ -1,4 +1,4 @@
--- LocalScript: Steal a Jeffy OP Menu v1.0 (God Mode/Admin)
+-- LocalScript: Steal a Jeffy OP Admin Panel
 -- Place inside StarterPlayerScripts
 
 local Players = game:GetService("Players")
@@ -10,18 +10,18 @@ local character = player.Character or player.CharacterAdded:Wait()
 local humanoid = character:WaitForChild("Humanoid")
 
 -- SETTINGS
-local SPEED_VALUE = 125 -- WalkSpeed
-local autoStealActive = false
+local SPEED_VALUE = 125
+local autoFarmActive = false
 local noclipActive = false
 local espActive = false
 
 -- GUI
 local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "StealJeffyOP"
+ScreenGui.Name = "StealJeffyAdminPanel"
 ScreenGui.Parent = player:WaitForChild("PlayerGui")
 ScreenGui.ResetOnSpawn = false
 
--- Helper Notification
+-- Notifications
 local function ShowNotification(msg,color)
 	local notif = Instance.new("TextLabel")
 	notif.Size = UDim2.new(0,300,0,30)
@@ -36,7 +36,7 @@ local function ShowNotification(msg,color)
 	Debris:AddItem(notif,2)
 end
 
--- Draggable Frame Function
+-- Draggable Frame
 local function makeDraggable(frame)
 	local dragging = false
 	local dragInput, mousePos, framePos
@@ -66,7 +66,7 @@ end
 
 -- Main Frame
 local MainFrame = Instance.new("Frame")
-MainFrame.Size = UDim2.new(0,300,0,400)
+MainFrame.Size = UDim2.new(0,320,0,450)
 MainFrame.Position = UDim2.new(0,50,0,50)
 MainFrame.BackgroundColor3 = Color3.fromRGB(0,0,0)
 MainFrame.BorderSizePixel = 0
@@ -76,7 +76,7 @@ makeDraggable(MainFrame)
 
 -- Title
 local Title = Instance.new("TextLabel")
-Title.Text = "Steal a Jeffy OP Menu"
+Title.Text = "Steal a Jeffy Admin Panel"
 Title.Size = UDim2.new(1,0,0,30)
 Title.Position = UDim2.new(0,0,0,5)
 Title.BackgroundTransparency = 1
@@ -101,7 +101,7 @@ local function createButton(text,pos,color,callback)
 	return btn
 end
 
--- SPEED TOGGLE
+-- SPEED BOOST
 local speedActive = false
 createButton("Speed Boost ("..SPEED_VALUE..")", UDim2.new(0.1,0,0,50), Color3.fromRGB(0,200,0), function()
 	speedActive = not speedActive
@@ -109,38 +109,50 @@ createButton("Speed Boost ("..SPEED_VALUE..")", UDim2.new(0.1,0,0,50), Color3.fr
 	ShowNotification(speedActive and "Speed ON" or "Speed OFF", speedActive and Color3.fromRGB(0,255,0) or Color3.fromRGB(255,255,255))
 end)
 
--- NOCLIP TOGGLE
+-- NOCLIP
 createButton("Noclip", UDim2.new(0.1,0,0,100), Color3.fromRGB(200,0,0), function()
 	noclipActive = not noclipActive
 	ShowNotification(noclipActive and "Noclip ON" or "Noclip OFF", noclipActive and Color3.fromRGB(0,255,0) or Color3.fromRGB(255,0,0))
 end)
 
--- AUTO STEAL TOGGLE
-createButton("Auto Steal", UDim2.new(0.1,0,0,150), Color3.fromRGB(200,0,200), function()
-	autoStealActive = not autoStealActive
-	ShowNotification(autoStealActive and "Auto Steal ON" or "Auto Steal OFF", autoStealActive and Color3.fromRGB(0,255,0) or Color3.fromRGB(255,0,0))
+-- AUTO FARM / PICK PLACEHOLDER
+createButton("Auto Farm / Pick Jeffy", UDim2.new(0.1,0,0,150), Color3.fromRGB(200,0,200), function()
+	autoFarmActive = not autoFarmActive
+	ShowNotification(autoFarmActive and "Auto Farm ON" or "Auto Farm OFF", autoFarmActive and Color3.fromRGB(0,255,0) or Color3.fromRGB(255,0,0))
 end)
 
 -- TELEPORT TO PLAYER
 createButton("Teleport to Player", UDim2.new(0.1,0,0,200), Color3.fromRGB(0,0,200), function()
-	local target = Players:GetPlayers()[2] -- Example: teleport to second player
+	local target = Players:GetPlayers()[2] -- example target
 	if target and target.Character and target.Character:FindFirstChild("HumanoidRootPart") then
 		character:SetPrimaryPartCFrame(target.Character.HumanoidRootPart.CFrame + Vector3.new(0,5,0))
 		ShowNotification("Teleported to "..target.Name, Color3.fromRGB(0,255,255))
 	end
 end)
 
--- VISUAL ENEMY (ESP)
-createButton("Visual Enemy ESP", UDim2.new(0.1,0,0,250), Color3.fromRGB(255,100,0), function()
+-- SPAWN ITEM BUTTON (example)
+createButton("Spawn Item (Test)", UDim2.new(0.1,0,0,250), Color3.fromRGB(0,200,200), function()
+	-- Example: create a part representing item
+	local item = Instance.new("Part")
+	item.Size = Vector3.new(4,1,4)
+	item.Position = character.HumanoidRootPart.Position + Vector3.new(0,5,0)
+	item.BrickColor = BrickColor.Random()
+	item.Name = "SpawnedItem"
+	item.Parent = workspace
+	ShowNotification("Spawned item!", Color3.fromRGB(0,255,0))
+end)
+
+-- VISUAL ENEMY / BASE ESP
+createButton("Visual Enemy ESP", UDim2.new(0.1,0,0,300), Color3.fromRGB(255,100,0), function()
 	espActive = not espActive
 	ShowNotification(espActive and "ESP ON" or "ESP OFF", espActive and Color3.fromRGB(0,255,0) or Color3.fromRGB(255,0,0))
 end)
 
--- ADMIN COMMAND (example kick)
-createButton("Kick Player", UDim2.new(0.1,0,0,300), Color3.fromRGB(255,0,0), function()
-	local target = Players:GetPlayers()[2] -- Example: second player
+-- ADMIN COMMAND (kick example)
+createButton("Kick Player", UDim2.new(0.1,0,0,350), Color3.fromRGB(255,0,0), function()
+	local target = Players:GetPlayers()[2] -- example
 	if target then
-		target:Kick("Kicked by Steal a Jeffy OP Menu")
+		target:Kick("Kicked by Admin Panel")
 	end
 end)
 
@@ -155,9 +167,9 @@ RunService.Stepped:Connect(function()
 		end
 	end
 
-	-- Auto Steal placeholder (teleport inside bases or fire RemoteEvent if known)
-	if autoStealActive then
-		-- Example: teleport to all other players (simulate stealing)
+	-- Auto Farm / Pick placeholder
+	if autoFarmActive then
+		-- Example: teleport to all other players (simulate farming)
 		for _, plr in pairs(Players:GetPlayers()) do
 			if plr ~= player and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
 				character:SetPrimaryPartCFrame(plr.Character.HumanoidRootPart.CFrame + Vector3.new(0,5,0))
@@ -165,7 +177,7 @@ RunService.Stepped:Connect(function()
 		end
 	end
 
-	-- ESP (Highlight enemies)
+	-- ESP
 	if espActive then
 		for _, plr in pairs(Players:GetPlayers()) do
 			if plr ~= player and plr.Character and not plr.Character:FindFirstChild("ESP") then
