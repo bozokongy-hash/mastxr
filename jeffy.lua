@@ -1,200 +1,354 @@
--- LocalScript: Steal a Jeffy OP Admin Panel
--- Place inside StarterPlayerScripts
+-- Sweb Hub - Sweb Tools (injected tab with requested features)
+-- Loader URL: replace if you host your own SwebHub
+local OrionLib = loadstring(game:HttpGet('https://raw.githubusercontent.com/adminabuser/terst/refs/heads/main/source.lua'))()
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
-local UIS = game:GetService("UserInputService")
+local UserInputService = game:GetService("UserInputService")
+local Workspace = game:GetService("Workspace")
 local Debris = game:GetService("Debris")
-local player = Players.LocalPlayer
-local character = player.Character or player.CharacterAdded:Wait()
-local humanoid = character:WaitForChild("Humanoid")
+local LocalPlayer = Players.LocalPlayer
 
--- SETTINGS
-local SPEED_VALUE = 125
-local autoFarmActive = false
-local noclipActive = false
-local espActive = false
+-- basic helpers
+local function getChar(plr) plr = plr or LocalPlayer return plr.Character or plr.CharacterAdded:Wait() end
+local function getRootPart(plr) local c = getChar(plr) if not c then return nil end return c:FindFirstChild("HumanoidRootPart") or c:FindFirstChild("Torso") or c:FindFirstChild("UpperTorso") end
+local function getHumanoid(plr) local c = getChar(plr) return c and c:FindFirstChildOfClass("Humanoid") end
+local function isAlive(plr) local hum = getHumanoid(plr) return hum and hum.Health > 0 end
 
--- GUI
-local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "StealJeffyAdminPanel"
-ScreenGui.Parent = player:WaitForChild("PlayerGui")
-ScreenGui.ResetOnSpawn = false
-
--- Notifications
-local function ShowNotification(msg,color)
-	local notif = Instance.new("TextLabel")
-	notif.Size = UDim2.new(0,300,0,30)
-	notif.Position = UDim2.new(0,10,1,-170)
-	notif.BackgroundColor3 = Color3.fromRGB(30,30,30)
-	notif.TextColor3 = color or Color3.fromRGB(255,255,255)
-	notif.TextScaled = true
-	notif.Font = Enum.Font.Gotham
-	notif.Text = msg
-	notif.Parent = ScreenGui
-	Instance.new("UICorner", notif).CornerRadius = UDim.new(0,6)
-	Debris:AddItem(notif,2)
+-- find nearest by name pattern
+local function findNearestByName(pattern, range)
+    local lpRoot = getRootPart(LocalPlayer)
+    if not lpRoot then return nil, math.huge end
+    local nearest, ndist = nil, math.huge
+    for _, obj in pairs(Workspace:GetDescendants()) do
+        if obj:IsA("BasePart") then
+            local name = tostring(obj.Name):lower()
+            if name:find(pattern:lower()) then
+                local dist = (obj.Position - lpRoot.Position).Magnitude
+                if dist < ndist and dist <= (range or 200) then
+                    nearest, ndist = obj, dist
+                end
+            end
+        end
+    end
+    return nearest, ndist
 end
 
--- Draggable Frame
-local function makeDraggable(frame)
-	local dragging = false
-	local dragInput, mousePos, framePos
-	local function update(input)
-		local delta = input.Position - mousePos
-		frame.Position = UDim2.new(framePos.X.Scale, framePos.X.Offset+delta.X, framePos.Y.Scale, framePos.Y.Offset+delta.Y)
-	end
-	frame.InputBegan:Connect(function(input)
-		if input.UserInputType == Enum.UserInputType.MouseButton1 then
-			dragging = true
-			mousePos = input.Position
-			framePos = frame.Position
-			input.Changed:Connect(function()
-				if input.UserInputState == Enum.UserInputState.End then dragging = false end
-			end)
-		end
-	end)
-	frame.InputChanged:Connect(function(input)
-		if input.UserInputType == Enum.UserInputType.MouseMovement then
-			dragInput = input
-		end
-	end)
-	UIS.InputChanged:Connect(function(input)
-		if input == dragInput and dragging then update(input) end
-	end)
+-- general remote caller (searches guessed names in ReplicatedStorage & Workspace)
+local function tryCallRemoteWithGuesses(item, guesses)
+    guesses = guesses or {}
+    local searchRoots = {game:GetService("ReplicatedStorage"), Workspace}
+    for _, root in ipairs(searchRoots) do
+        for _, r in ipairs(root:GetDescendants()) do
+            if (r:IsA("RemoteEvent") or r:IsA("RemoteFunction")) then
+                local lname = tostring(r.Name):lower()
+                for _, g in ipairs(guesses) do
+                    if lname:find(g:lower()) then
+                        local ok, res = pcall(function()
+                            if r:IsA("RemoteEvent") then
+                                r:FireServer(item)
+                            else
+                                r:InvokeServer(item)
+                            end
+                        end)
+                        if ok then return true end
+                    end
+                end
+            end
+        end
+    end
+    return false
 end
 
--- Main Frame
-local MainFrame = Instance.new("Frame")
-MainFrame.Size = UDim2.new(0,320,0,450)
-MainFrame.Position = UDim2.new(0,50,0,50)
-MainFrame.BackgroundColor3 = Color3.fromRGB(0,0,0)
-MainFrame.BorderSizePixel = 0
-MainFrame.Parent = ScreenGui
-Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0,10)
-makeDraggable(MainFrame)
-
--- Title
-local Title = Instance.new("TextLabel")
-Title.Text = "Steal a Jeffy Admin Panel"
-Title.Size = UDim2.new(1,0,0,30)
-Title.Position = UDim2.new(0,0,0,5)
-Title.BackgroundTransparency = 1
-Title.TextColor3 = Color3.fromRGB(255,255,255)
-Title.Font = Enum.Font.GothamBold
-Title.TextScaled = true
-Title.Parent = MainFrame
-
--- Button Creator
-local function createButton(text,pos,color,callback)
-	local btn = Instance.new("TextButton")
-	btn.Size = UDim2.new(0.8,0,0,30)
-	btn.Position = pos
-	btn.BackgroundColor3 = color
-	btn.TextColor3 = Color3.fromRGB(255,255,255)
-	btn.Text = text
-	btn.Font = Enum.Font.Gotham
-	btn.TextScaled = true
-	btn.Parent = MainFrame
-	Instance.new("UICorner", btn).CornerRadius = UDim.new(0,6)
-	btn.MouseButton1Click:Connect(callback)
-	return btn
+-- teleport-to-touch fallback
+local function teleportToAndTouch(item)
+    if not item or not item:IsA("BasePart") then return false end
+    local hrp = getRootPart(LocalPlayer)
+    if not hrp then return false end
+    local original = hrp.CFrame
+    hrp.CFrame = item.CFrame + Vector3.new(0,2,0)
+    task.wait(0.12)
+    pcall(function() item:Touch() end)
+    task.wait(0.12)
+    pcall(function() hrp.CFrame = original end)
+    return true
 end
 
--- SPEED BOOST
-local speedActive = false
-createButton("Speed Boost ("..SPEED_VALUE..")", UDim2.new(0.1,0,0,50), Color3.fromRGB(0,200,0), function()
-	speedActive = not speedActive
-	humanoid.WalkSpeed = speedActive and SPEED_VALUE or 16
-	ShowNotification(speedActive and "Speed ON" or "Speed OFF", speedActive and Color3.fromRGB(0,255,0) or Color3.fromRGB(255,255,255))
+-- Create Window & Tab
+local Window = OrionLib:MakeWindow({
+    Name = "Sweb Hub - Tools",
+    HidePremium = false,
+    SaveConfig = true,
+    ConfigFolder = "SwebHubConfig",
+    IntroEnabled = false
+})
+
+local tab = Window:MakeTab({Name="Sweb Tools", Icon="rbxassetid://4483345998"})
+local settingsTab = Window:MakeTab({Name="Sweb Tools - Settings", Icon="rbxassetid://6023426915"})
+
+-- config / states
+local cfg = {
+    autoStealer = false,
+    autoFarm = false,
+    autoPickBrainrot = false,
+    espEnemies = false,
+    noclip = false,
+    speedEnabled = false,
+    walkspeed = 16,
+    dupeGuesses = {"DupePet", "Dupe", "PetDupe"},
+    stealerNames = {"jeffy", "item", "pickup"},
+    farmNames = {"FarmSpot", "Crop", "Tree", "Farmable"},
+    brainrotNames = {"brainrot", "brain rot"},
+    adminGuesses = {"Admin", "RunCommand", "Execute", "AdminCmd"}
+}
+
+-- ---------- DUPE PET ----------
+tab:AddButton({
+    Name = "DUPE PET (attempt)",
+    Callback = function()
+        -- This is a generic attempt: find remote with guessed names and call with no args.
+        local ok = tryCallRemoteWithGuesses(nil, cfg.dupeGuesses)
+        if ok then
+            OrionLib:MakeNotification({Name="SwebHub", Content="Dupe remote called (guess).", Time=3})
+        else
+            OrionLib:MakeNotification({Name="SwebHub", Content="No dupe remote found. You must supply the remote name.", Time=3})
+        end
+    end
+})
+
+-- ---------- AUTO STEALER ----------
+tab:AddToggle({
+    Name = "Auto Stealer",
+    Default = false,
+    Callback = function(v) cfg.autoStealer = v end
+})
+tab:AddSlider({
+    Name = "Auto Steal Range",
+    Min = 10, Max = 500, Default = 80, Increment = 5,
+    Callback = function(v) cfg.stealRange = v end
+})
+tab:AddButton({
+    Name = "Force Steal Now",
+    Callback = function()
+        local item, dist = findNearestByName("jeffy", cfg.stealRange or 80)
+        if item then
+            local success = tryCallRemoteWithGuesses(item, {"pickup", "Collect", "CollectItem", "PickupItem"}) or teleportToAndTouch(item)
+            OrionLib:MakeNotification({Name="SwebHub", Content = success and "Attempted steal." or "Steal failed.", Time=3})
+        else
+            OrionLib:MakeNotification({Name="SwebHub", Content = "No target found.", Time=3})
+        end
+    end
+})
+
+-- ---------- VISUAL ENEMY (ESP) ----------
+local espEntries = {}
+local function createESPForPlayer(p)
+    if not p.Character then return end
+    local root = p.Character:FindFirstChild("HumanoidRootPart") or p.Character:FindFirstChild("Torso")
+    if not root then return end
+    if root:FindFirstChild("SwebESP") then return end
+    local billboard = Instance.new("BillboardGui")
+    billboard.Name = "SwebESP"
+    billboard.Adornee = root
+    billboard.Size = UDim2.new(0,120,0,40)
+    billboard.AlwaysOnTop = true
+    local t = Instance.new("TextLabel", billboard)
+    t.Size = UDim2.new(1,0,1,0)
+    t.BackgroundTransparency = 1
+    t.Text = p.Name
+    t.Font = Enum.Font.GothamBold
+    t.TextSize = 14
+    t.TextColor3 = Color3.new(1,0.2,0.2)
+    billboard.Parent = root
+    espEntries[p] = billboard
+end
+
+local function clearAllESP()
+    for p,b in pairs(espEntries) do
+        if b and b.Parent then b:Destroy() end
+    end
+    espEntries = {}
+end
+
+tab:AddToggle({
+    Name = "Visual Enemy (ESP)",
+    Default = false,
+    Callback = function(v)
+        cfg.espEnemies = v
+        if not v then clearAllESP() end
+    end
+})
+
+-- ---------- BASE TIME INDICATOR ----------
+-- simple label in StarterGui showing uptime / server time approximation
+local baseTimeLabel
+do
+    local StarterGui = game:GetService("StarterGui")
+    baseTimeLabel = Instance.new("ScreenGui")
+    baseTimeLabel.Name = "SwebBaseTime"
+    local t = Instance.new("TextLabel", baseTimeLabel)
+    t.Size = UDim2.new(0,220,0,28)
+    t.Position = UDim2.new(0,10,0,10)
+    t.BackgroundTransparency = 0.4
+    t.BackgroundColor3 = Color3.fromRGB(20,20,20)
+    t.TextColor3 = Color3.fromRGB(255,255,255)
+    t.Text = "Base Time: 00:00:00"
+    t.Font = Enum.Font.GothamBold
+    t.TextSize = 14
+    baseTimeLabel.Parent = (gethui and gethui()) or game:GetService("CoreGui")
+end
+
+RunService.RenderStepped:Connect(function()
+    if baseTimeLabel and baseTimeLabel:FindFirstChildOfClass("TextLabel") then
+        local tl = baseTimeLabel:FindFirstChildOfClass("TextLabel")
+        local h = os.date("!*t").hour -- UTC as a fallback
+        local m = os.date("!*t").min
+        local s = os.date("!*t").sec
+        tl.Text = string.format("Base Time (UTC): %02d:%02d:%02d", h, m, s)
+    end
 end)
 
--- NOCLIP
-createButton("Noclip", UDim2.new(0.1,0,0,100), Color3.fromRGB(200,0,0), function()
-	noclipActive = not noclipActive
-	ShowNotification(noclipActive and "Noclip ON" or "Noclip OFF", noclipActive and Color3.fromRGB(0,255,0) or Color3.fromRGB(255,0,0))
+-- ---------- ADMIN COMMANDS ----------
+local adminTextbox = tab:AddTextbox({Name="Admin Command", Default="", TextDisappear=false, Callback=function(v) end})
+tab:AddButton({Name="Send Admin Command (guess)", Callback=function()
+    local cmd = adminTextbox:GetValue() or ""
+    if cmd == "" then OrionLib:MakeNotification({Name="SwebHub", Content="Type a command in the box.", Time=3}); return end
+    local ok = false
+    -- attempt to find admin remotes and send the command as string
+    ok = tryCallRemoteWithGuesses(cmd, cfg.adminGuesses)
+    OrionLib:MakeNotification({Name="SwebHub", Content = ok and "Command sent (guess)." or "No admin remote found or command failed.", Time=4})
+end})
+
+-- ---------- AUTO FARM ----------
+tab:AddToggle({Name="Auto Farm", Default=false, Callback=function(v) cfg.autoFarm=v end})
+tab:AddSlider({Name="Auto Farm Range", Min=10, Max=800, Default=150, Increment=5, Callback=function(v) cfg.farmRange=v end})
+tab:AddButton({Name="Force Farm Now", Callback=function()
+    local obj, d = findNearestByName("farm", cfg.farmRange or 150)
+    if obj then
+        local ok = tryCallRemoteWithGuesses(obj, {"Farm", "Collect", "Harvest"}) or teleportToAndTouch(obj)
+        OrionLib:MakeNotification({Name="SwebHub", Content = ok and "Tried farming." or "Farm failed.", Time=3})
+    else
+        OrionLib:MakeNotification({Name="SwebHub", Content = "No farmable found.", Time=3})
+    end
+end})
+
+-- ---------- AUTO PICK BRAINROT ----------
+tab:AddToggle({Name="Auto Pick Brainrot", Default=false, Callback=function(v) cfg.autoPickBrainrot=v end})
+tab:AddSlider({Name="Brainrot Range", Min=10, Max=600, Default=200, Increment=5, Callback=function(v) cfg.brainRange=v end})
+
+-- ---------- TELEPORT ----------
+tab:AddTextbox({Name="Teleport Coordinates (x,y,z)", Default="", TextDisappear=false, Callback=function(v) end})
+tab:AddButton({Name="Teleport to Coords", Callback=function()
+    local txt = tab:GetChildren() -- not reliable across libs; instead get textbox value above:
+    local coords = tab:GetChildren()
+    -- quick find of the Textbox (best-effort)
+    local foundVal
+    for _, child in ipairs(tab.Container:GetChildren()) do
+        if child.ClassName == "TextBox" and child.Name:find("Teleport") then foundVal = child.Text break end
+    end
+    local val = foundVal or "" -- fallback empty
+    if val == "" then OrionLib:MakeNotification({Name="SwebHub", Content="Enter x,y,z in textbox.", Time=3}); return end
+    local x,y,z = string.match(val, "([%-%d%.]+)%s*,%s*([%-%d%.]+)%s*,%s*([%-%d%.]+)")
+    if not x then OrionLib:MakeNotification({Name="SwebHub", Content="Bad coords format, use x,y,z", Time=3}); return end
+    local hrp = getRootPart(LocalPlayer)
+    if hrp then
+        pcall(function() hrp.CFrame = CFrame.new(tonumber(x), tonumber(y), tonumber(z)) end)
+    end
+end})
+tab:AddButton({Name="Teleport to Mouse", Callback=function()
+    local mouse = LocalPlayer:GetMouse()
+    local hit = mouse.Hit
+    local hrp = getRootPart(LocalPlayer)
+    if hrp and hit then
+        pcall(function() hrp.CFrame = CFrame.new(hit.p + Vector3.new(0,3,0)) end)
+    end
+end})
+
+-- ---------- NOCLIP ----------
+tab:AddToggle({Name="Noclip", Default=false, Callback=function(v)
+    cfg.noclip = v
+    if v then
+        -- enable noclip by setting CanCollide false on character parts
+        RunService.Stepped:Connect(function()
+            local c = getChar()
+            if c then
+                for _, part in pairs(c:GetDescendants()) do
+                    if part:IsA("BasePart") then
+                        part.CanCollide = false
+                    end
+                end
+            end
+        end)
+    else
+        -- we don't attempt to restore original collisions here - slight risk; a full restore would need saved states
+    end
+end})
+
+-- ---------- SPEED ----------
+tab:AddToggle({Name="Enable Speed", Default=false, Callback=function(v) cfg.speedEnabled=v end})
+tab:AddSlider({Name="WalkSpeed", Min=16, Max=300, Default=16, Increment=1, Callback=function(v) cfg.walkspeed=v end})
+
+-- ---------- RUNTIME LOOPS ----------
+-- Auto-steal / auto-farm / brainrot loops
+task.spawn(function()
+    while true do
+        task.wait(0.25)
+        -- speed
+        if cfg.speedEnabled then
+            local hum = getHumanoid(LocalPlayer)
+            if hum then
+                pcall(function() hum.WalkSpeed = cfg.walkspeed or 16 end)
+            end
+        else
+            local hum = getHumanoid(LocalPlayer)
+            if hum then pcall(function() hum.WalkSpeed = 16 end) end
+        end
+
+        -- auto stealer
+        if cfg.autoStealer then
+            local item, dist = findNearestByName("jeffy", cfg.stealRange or 80)
+            if item then
+                local success = tryCallRemoteWithGuesses(item, {"pickup","collect","pickupitem"}) or teleportToAndTouch(item)
+                task.wait(0.6)
+            end
+        end
+
+        -- auto farm
+        if cfg.autoFarm then
+            local obj = findNearestByName("farm", cfg.farmRange or 150)
+            if obj then
+                tryCallRemoteWithGuesses(obj, {"harvest","collect","farm"})
+                task.wait(0.6)
+            end
+        end
+
+        -- auto pick brainrot
+        if cfg.autoPickBrainrot then
+            local item = findNearestByName("brainrot", cfg.brainRange or 200)
+            if item then
+                local ok = tryCallRemoteWithGuesses(item, {"pickup","collect","pickupitem"}) or teleportToAndTouch(item)
+                task.wait(0.6)
+            end
+        end
+    end
 end)
 
--- AUTO FARM / PICK PLACEHOLDER
-createButton("Auto Farm / Pick Jeffy", UDim2.new(0.1,0,0,150), Color3.fromRGB(200,0,200), function()
-	autoFarmActive = not autoFarmActive
-	ShowNotification(autoFarmActive and "Auto Farm ON" or "Auto Farm OFF", autoFarmActive and Color3.fromRGB(0,255,0) or Color3.fromRGB(255,0,0))
+-- ESP render loop
+RunService.RenderStepped:Connect(function()
+    if cfg.espEnemies then
+        for _, p in pairs(Players:GetPlayers()) do
+            if p ~= LocalPlayer and isAlive(p) then
+                if not espEntries[p] then createESPForPlayer(p) end
+            else
+                if espEntries[p] then
+                    if espEntries[p].Parent then espEntries[p]:Destroy() end
+                    espEntries[p] = nil
+                end
+            end
+        end
+    end
 end)
 
--- TELEPORT TO PLAYER
-createButton("Teleport to Player", UDim2.new(0.1,0,0,200), Color3.fromRGB(0,0,200), function()
-	local target = Players:GetPlayers()[2] -- example target
-	if target and target.Character and target.Character:FindFirstChild("HumanoidRootPart") then
-		character:SetPrimaryPartCFrame(target.Character.HumanoidRootPart.CFrame + Vector3.new(0,5,0))
-		ShowNotification("Teleported to "..target.Name, Color3.fromRGB(0,255,255))
-	end
-end)
-
--- SPAWN ITEM BUTTON (example)
-createButton("Spawn Item (Test)", UDim2.new(0.1,0,0,250), Color3.fromRGB(0,200,200), function()
-	-- Example: create a part representing item
-	local item = Instance.new("Part")
-	item.Size = Vector3.new(4,1,4)
-	item.Position = character.HumanoidRootPart.Position + Vector3.new(0,5,0)
-	item.BrickColor = BrickColor.Random()
-	item.Name = "SpawnedItem"
-	item.Parent = workspace
-	ShowNotification("Spawned item!", Color3.fromRGB(0,255,0))
-end)
-
--- VISUAL ENEMY / BASE ESP
-createButton("Visual Enemy ESP", UDim2.new(0.1,0,0,300), Color3.fromRGB(255,100,0), function()
-	espActive = not espActive
-	ShowNotification(espActive and "ESP ON" or "ESP OFF", espActive and Color3.fromRGB(0,255,0) or Color3.fromRGB(255,0,0))
-end)
-
--- ADMIN COMMAND (kick example)
-createButton("Kick Player", UDim2.new(0.1,0,0,350), Color3.fromRGB(255,0,0), function()
-	local target = Players:GetPlayers()[2] -- example
-	if target then
-		target:Kick("Kicked by Admin Panel")
-	end
-end)
-
--- MAIN LOOP
-RunService.Stepped:Connect(function()
-	-- Noclip
-	if noclipActive then
-		for _, part in pairs(character:GetDescendants()) do
-			if part:IsA("BasePart") then
-				part.CanCollide = false
-			end
-		end
-	end
-
-	-- Auto Farm / Pick placeholder
-	if autoFarmActive then
-		-- Example: teleport to all other players (simulate farming)
-		for _, plr in pairs(Players:GetPlayers()) do
-			if plr ~= player and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
-				character:SetPrimaryPartCFrame(plr.Character.HumanoidRootPart.CFrame + Vector3.new(0,5,0))
-			end
-		end
-	end
-
-	-- ESP
-	if espActive then
-		for _, plr in pairs(Players:GetPlayers()) do
-			if plr ~= player and plr.Character and not plr.Character:FindFirstChild("ESP") then
-				local h = Instance.new("Highlight")
-				h.Name = "ESP"
-				h.Adornee = plr.Character
-				h.FillColor = Color3.fromRGB(255,0,0)
-				h.OutlineColor = Color3.fromRGB(0,0,0)
-				h.Parent = plr.Character
-			end
-		end
-	end
-end)
-
--- TOGGLE MENU VISIBILITY
-UIS.InputBegan:Connect(function(input,gpe)
-	if not gpe and input.KeyCode == Enum.KeyCode.RightShift then
-		MainFrame.Visible = not MainFrame.Visible
-	end
-end)
+-- init
+if OrionLib.Init then pcall(function() OrionLib:Init() end) end
+print("[SwebHub] Sweb Tools injected")
